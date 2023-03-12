@@ -15,7 +15,7 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-dd('here');
+
 
 Route::post('/auth/register', [AuthController::class, 'create_user']);
 Route::post('/auth/login', [AuthController::class, 'login_user']);
