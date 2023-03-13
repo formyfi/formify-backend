@@ -37,6 +37,6 @@ jobs:
         username: root
         password: formY5@project
         port: 22
-        protocol: ftps
+        protocol: ftp
         server-dir: /var/www/html/
         log-level	: standard
