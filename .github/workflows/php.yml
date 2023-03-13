@@ -30,13 +30,13 @@ jobs:
           ${{ runner.os }}-php-
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
-    - name: FTP-Deploy-Action
-      uses: SamKirkland/FTP-Deploy-Action@2.0.0
-      env:
-        FTP_SERVER: "159.203.15.162"
-        FTP_USERNAME: "root"
-        FTP_PASSWORD: "formY5@project"
-        LOCAL_DIR: build
-        METHOD: sftp
-        PORT: 22
-        ARGS: --delete
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@4.3.3
+      with:
+        server: 159.203.15.162
+        username: root
+        password: formY5@project
+        port: 22
+        protocol: sftp
+        server-dir: /var/www/html
+        log-level	: standard
