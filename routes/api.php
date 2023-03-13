@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,11 +17,14 @@ use App\Http\Controllers\AuthController;
 
 
 
-Route::post('/auth/register', [AuthController::class, 'create_user']);
-Route::post('/auth/login', [AuthController::class, 'login_user']);
 
-//Route::get('authentication/login', ['uses' => 'Authentication/AuthController@user_login']);
+Route::post('/auth/login', [UserController::class, 'login_user']);
+Route::post('/auth/admin_registration', [UserController::class, 'create_admin_user']);
+//Route::get('authentication/login', ['uses' => 'Authentication/UserController@user_login']);
 
-// Route::group(['middleware' => ['auth:sanctum'], function(){
-
-// }]);
+Route::group(['middleware' => ['auth:sanctum']], function(){
+    
+    Route::get('/users/get_users', [UserController::class, 'get_users']);
+    Route::post('/auth/register', [UserController::class, 'create_user']);
+    Route::post('/auth/update_user', [UserController::class, 'update_user']);
+});
