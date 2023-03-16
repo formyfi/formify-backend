@@ -73,7 +73,7 @@ class UserController extends Controller
 
             if($validateUser->fails()){
                 return response()->json([
-                    'status' => false,
+                    'success' => false,
                     'message' => 'validation error',
                     'errors' => $validateUser->errors()
                 ], 401);
@@ -81,23 +81,24 @@ class UserController extends Controller
 
             if(!Auth::attempt($request->only(['user_name', 'password']))){
                 return response()->json([
-                    'status' => false,
+                    'success' => false,
                     'message' => 'User_name & Password does not match with our record.',
                 ], 401);
             }
 
             $user = User::where('user_name', $request->user_name)->first();
-
+         
             return response()->json([
-                'status' => true,
+                'success' => true,
                 'message' => 'User Logged In Successfully',
                 'user_id' => $user['id'],
+                'org_id' => $user['org_id'],
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ], 200);
 
         } catch (\Throwable $th) {
             return response()->json([
-                'status' => false,
+                'success' => false,
                 'message' => $th->getMessage()
             ], 500);
         }
