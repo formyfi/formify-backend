@@ -32,7 +32,7 @@ class Station extends Model {
 
     public static function get_stations_list(Int $org_id){
     
-            $results = DB::select("SELECT s.*
+            $results = DB::select("SELECT s.*, s.id AS value, s.name AS label
                 FROM stations s
                 WHERE s.org_id = ? AND s.active = 1", [$org_id]);
             
@@ -46,6 +46,6 @@ class Station extends Model {
             ->delete();
 
             return true;
-}
+    }
 
 }

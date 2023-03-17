@@ -27,13 +27,21 @@ Route::get('/stations/get_station_list', [StationController::class, 'get_station
 Route::post('/stations/upsert_station', [StationController::class, 'upsert_station']);
 Route::post('/stations/delete_station', [StationController::class, 'delete_station']);
 
+Route::post('/users/create_user', [UserController::class, 'create_user']);
+Route::post('/users/update_user', [UserController::class, 'update_user']);
+Route::post('/users/delete_user', [UserController::class, 'delete_user']);
+Route::get('/users/get_users', [UserController::class, 'get_users']);
+
+
+
+
 Route::group(['middleware' => ['auth:sanctum']], function(){
     //Users Get
-    Route::get('/users/get_users', [UserController::class, 'get_users']);
+    // Route::get('/users/get_users', [UserController::class, 'get_users']);
     
     //Users Post
-    Route::post('/auth/register', [UserController::class, 'create_user']);
-    Route::post('/auth/update_user', [UserController::class, 'update_user']);
+    // Route::post('/users/create_user', [UserController::class, 'create_user']);
+    // Route::post('/users/update_user', [UserController::class, 'update_user']);
 
     //Stations Get
    // Route::get('/stations/get_station_list', [StationController::class, 'get_station_list']);

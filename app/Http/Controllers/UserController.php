@@ -22,21 +22,19 @@ class UserController extends Controller
     public function create_user(Request $request){
 
             $user_details = $request->input('user_details');
+            $org_id = $request->input('org_id');
 
-            if(empty($user_details['user_name'] || empty($user_details['user_type']) || empty($user_details['org_id']) || empty($user_details['password']) || $user_details['first_name'])) return response()->json(['success' => false]);
+            if(empty($user_details['user_name'] || empty($user_details['user_type']) || empty($org_id) || empty($user_details['password']) || $user_details['first_name'])) return response()->json(['success' => false]);
 
-                $user_details['password'] = Hash::make($user_details['password']);
-                $id = UserServices::insert_user($user_details);
+            $user_details['password'] = Hash::make($user_details['password']);
+            $user_details['org_id'] = $org_id;
+            $id = UserServices::insert_user($user_details);
+            $list = UserServices::get_users_list((int)$org_id);
+    
+            if(!empty($list)){
+                return response()->json(['success' => true, 'user_list' => $list]);
+            } else return response()->json(['success' => true]);
 
-                if(!empty($id)){
-                    return response()->json([
-                        'success' => true,
-                        'user_id' => $id,
-                        'message' => 'User created successfully',
-                    ]);
-                } else return response()->json(['success' => false]);
-               
-            
     }
 
     public function create_admin_user(Request $request){
@@ -119,6 +117,7 @@ class UserController extends Controller
 
     public function update_user(Request $request){
         $user_details = $request->input('user_details');
+        $org_id = $request->input('org_id');
 
         if(empty($user_details['id'])) return response()->json(['success' => false]);
 
@@ -127,7 +126,29 @@ class UserController extends Controller
 
         UserServices::update_user_details_by_id($user_details);
 
-        return response()->json(['success' => true]);
+        $list = UserServices::get_users_list((int)$org_id);
+        
+        if(!empty($list)){
+            return response()->json(['success' => true, 'user_list' => $list]);
+        } else   return response()->json(['success' => true]);
+
+      
+        
+    }
+
+    public function delete_user(Request $request){
+        $id = $request->input('id');
+        $org_id = $request->input('org_id');
+
+        if(empty($id)) return response()->json(['success' => false]);
+
+        UserServices::delete_user(['id' => $id]);
+        
+        $list = UserServices::get_users_list((int)$org_id);
+        
+        if(!empty($list)){
+            return response()->json(['success' => true, 'user_list' => $list]);
+        } else return response()->json(['success' => true]);
         
     }
 }
