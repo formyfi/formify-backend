@@ -35,17 +35,17 @@ Route::get('/users/get_users', [UserController::class, 'get_users']);
 
 
 
-Route::group(['middleware' => ['auth:sanctum']], function(){
-    //Users Get
-    // Route::get('/users/get_users', [UserController::class, 'get_users']);
+// Route::group(['middleware' => ['auth:sanctum']], function(){
+//     //Users Get
+//     // Route::get('/users/get_users', [UserController::class, 'get_users']);
     
-    //Users Post
-    // Route::post('/users/create_user', [UserController::class, 'create_user']);
-    // Route::post('/users/update_user', [UserController::class, 'update_user']);
+//     //Users Post
+//     // Route::post('/users/create_user', [UserController::class, 'create_user']);
+//     // Route::post('/users/update_user', [UserController::class, 'update_user']);
 
-    //Stations Get
-   // Route::get('/stations/get_station_list', [StationController::class, 'get_station_list']);
+//     //Stations Get
+//    // Route::get('/stations/get_station_list', [StationController::class, 'get_station_list']);
 
  
 
-});
+// });

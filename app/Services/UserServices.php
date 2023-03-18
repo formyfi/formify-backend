@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\{
 
 class UserServices { 
 
+  
     public static function insert_user(Array $user_details){
       
        if(empty($user_details['user_type']) && !empty($user_details['user_type_value'])) $user_details['user_type'] = $user_details['user_type_value']['value'];
