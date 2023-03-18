@@ -218,6 +218,7 @@ CREATE TABLE `stations` (
   `name` varchar(20) DEFAULT NULL,
   `type` varchar(20) DEFAULT NULL,
   `org_id` int DEFAULT NULL,
+  `active` tinyint(1) DEFAULT '1',
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
