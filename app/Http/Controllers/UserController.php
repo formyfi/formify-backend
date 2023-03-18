@@ -43,6 +43,7 @@ class UserController extends Controller
 
         $user_details = $request->input('user_details');
 
+
         if(empty($user_details['user_name'] || empty($user_details['user_type']) || empty($user_details['org_id']) || empty($user_details['password']) || $user_details['first_name'])) return response()->json(['success' => false]);
 
             $user_details['password'] = Hash::make($user_details['password']);
@@ -73,7 +74,7 @@ class UserController extends Controller
 
             if($validateUser->fails()){
                 return response()->json([
-                    'status' => false,
+                    'success' => false,
                     'message' => 'validation error',
                     'errors' => $validateUser->errors()
                 ], 401);
@@ -81,7 +82,7 @@ class UserController extends Controller
 
             if(!Auth::attempt($request->only(['user_name', 'password']))){
                 return response()->json([
-                    'status' => false,
+                    'success' => false,
                     'message' => 'User_name & Password does not match with our record.',
                 ], 401);
             }
@@ -89,7 +90,7 @@ class UserController extends Controller
             $user = User::where('user_name', $request->user_name)->first();
 
             return response()->json([
-                'status' => true,
+                'success' => true,
                 'message' => 'User Logged In Successfully',
                 'user_id' => $user['id'],
                 'token' => $user->createToken("API TOKEN")->plainTextToken
@@ -97,7 +98,7 @@ class UserController extends Controller
 
         } catch (\Throwable $th) {
             return response()->json([
-                'status' => false,
+                'success' => false,
                 'message' => $th->getMessage()
             ], 500);
         }

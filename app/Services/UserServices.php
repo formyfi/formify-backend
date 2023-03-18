@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\{
 
 class UserServices { 
 
+  
     public static function insert_user(Array $user_details){
         
        $user_id =  Users::upsert_user($user_details);
