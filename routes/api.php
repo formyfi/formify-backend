@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    UserController,StationController
+    UserController,StationController, PartController
 };
 
 /*
@@ -26,6 +26,11 @@ Route::post('/auth/admin_registration', [UserController::class, 'create_admin_us
 Route::get('/stations/get_station_list', [StationController::class, 'get_station_list']);
 Route::post('/stations/upsert_station', [StationController::class, 'upsert_station']);
 Route::post('/stations/delete_station', [StationController::class, 'delete_station']);
+
+Route::get('/parts/get_part_list', [PartController::class, 'get_part_list']);
+Route::post('/parts/upsert_part', [PartController::class, 'upsert_part']);
+Route::post('/parts/delete_part', [PartController::class, 'delete_part']);
+
 
 Route::post('/users/create_user', [UserController::class, 'create_user']);
 Route::post('/users/update_user', [UserController::class, 'update_user']);

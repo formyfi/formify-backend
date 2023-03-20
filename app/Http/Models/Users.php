@@ -77,4 +77,12 @@ class Users extends Model {
             return (count($results) > 0) ? $results : false;
     }
 
+    public static function get_org_details(Int $org_id){
+       
+        $results = DB::select("SELECT *
+            FROM organization
+            WHERE id=?", [$org_id]);
+        
+        return (count($results) > 0) ? $results[0] : [];
+    }
 }

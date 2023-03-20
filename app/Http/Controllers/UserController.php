@@ -10,8 +10,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-
-
+use App\Http\Models\{
+    Users
+  };
 class UserController extends Controller
 {
    /**
@@ -85,12 +86,14 @@ class UserController extends Controller
             }
 
             $user = User::where('user_name', $request->user_name)->first();
-         
+            $org_detail = Users::get_org_details((int)$user['org_id']);
+           
             return response()->json([
                 'success' => true,
                 'message' => 'User Logged In Successfully',
                 'user_id' => $user['id'],
                 'org_id' => $user['org_id'],
+                'org_name' =>  $org_detail->org_name,
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ], 200);
 
