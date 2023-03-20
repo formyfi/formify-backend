@@ -42,6 +42,7 @@ class UserController extends Controller
 
         $user_details = $request->input('user_details');
 
+
         if(empty($user_details['user_name'] || empty($user_details['user_type']) || empty($user_details['org_id']) || empty($user_details['password']) || $user_details['first_name'])) return response()->json(['success' => false]);
 
             $user_details['password'] = Hash::make($user_details['password']);
