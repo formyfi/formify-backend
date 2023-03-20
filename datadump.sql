@@ -127,7 +127,15 @@ CREATE TABLE `organization` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+LOCK TABLES `organization` WRITE;
+/*!40000 ALTER TABLE `organization` DISABLE KEYS */;
 
+INSERT INTO `organization` (`id`, `org_name`, `org_description`, `updated_at`, `created_at`)
+VALUES
+	(8,'Valiant TMS','Valco WIndosr','2023-03-19 18:40:58','2023-03-19 17:46:25');
+
+/*!40000 ALTER TABLE `organization` ENABLE KEYS */;
+UNLOCK TABLES;
 
 # Dump of table part_vnumber
 # ------------------------------------------------------------
