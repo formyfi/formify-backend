@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    UserController,StationController, PartController
+    UserController,StationController, PartController, ChecklistController
 };
 
 /*
@@ -54,3 +54,8 @@ Route::get('/users/get_users', [UserController::class, 'get_users']);
  
 
 // });
+
+
+Route::get('/checklist/get_checklists', [ChecklistController::class, 'get_checklists']);
+Route::post('/checklist/upsert_checklist', [ChecklistController::class, 'upsert_checklist']);
+Route::post('/checklist/delete_checklist', [ChecklistController::class, 'delete_checklist']);
