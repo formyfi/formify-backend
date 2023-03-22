@@ -81,13 +81,14 @@ DROP TABLE IF EXISTS `forms`;
 CREATE TABLE `forms` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(200) DEFAULT NULL,
+  `org_id` int DEFAULT NULL,
   `station_id` int DEFAULT NULL,
   `part_id` int DEFAULT NULL,
-  `form_json` text DEFAULT NULL,
+  `form_json` text,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 
