@@ -13,7 +13,6 @@ class ChecklistServices {
 
     public static function insert_checklist(Array $checklist_details){
         
-
         $checklist_id =  Checklist::upsert_checklist($checklist_details);
 
         
