@@ -40,10 +40,7 @@ class Part extends Model {
             ->insertGetId($update_params);
            }
            
-
-            return ($insert_id) ? $insert_id : false;
-        
-
+            return true;
     }
 
     public static function get_part_list(Int $org_id){

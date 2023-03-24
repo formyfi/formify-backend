@@ -31,7 +31,7 @@ class Checklist extends Model {
 
     public static function get_checklists(Int $org_id){
     
-            $results = DB::select("SELECT s.*, s.id, st.name as station_name, pt.name as part_name FROM forms s JOIN stations st ON st.id=s.station_id JOIN parts pt ON pt.id=s.part_id  WHERE s.org_id = ? GROUP BY s.id", [$org_id]);
+            $results = DB::select("SELECT s.*, s.id, st.name as station_name, pt.name as part_name FROM forms s LEFT JOIN stations st ON st.id=s.station_id LEFT JOIN parts pt ON pt.id=s.part_id  WHERE s.org_id = ? GROUP BY s.id", [$org_id]);
             
             return (count($results) > 0) ? $results : false;
     }
