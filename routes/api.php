@@ -22,9 +22,12 @@ use App\Http\Controllers\{
 
 Route::post('/auth/login', [UserController::class, 'login_user']);
 Route::post('/auth/admin_registration', [UserController::class, 'create_admin_user']);
+Route::post('/auth/logout', [UserController::class, 'logout']);
 
 Route::group(['middleware' => ['auth:sanctum']], function(){
-    
+    //logout
+   // Route::post('/auth/logout', [UserController::class, 'logout']);
+
     //Users Get
     Route::get('/users/get_users', [UserController::class, 'get_users']);
     

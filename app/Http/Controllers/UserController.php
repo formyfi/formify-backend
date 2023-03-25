@@ -94,6 +94,7 @@ class UserController extends Controller
                 'message' => 'User Logged In Successfully',
                 'user_id' => $user['id'],
                 'org_id' => $user['org_id'],
+                'user_type_id' => $user['user_type'],
                 'org_name' =>  $org_detail?$org_detail->org_name:'-',
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ], 200);
@@ -154,5 +155,11 @@ class UserController extends Controller
             return response()->json(['success' => true, 'user_list' => $list]);
         } else return response()->json(['success' => true]);
         
+    }
+
+    public static function logout(){
+       Auth::user()->currentAccessToken()->delete();
+
+       return response()->json(['success' => true]);
     }
 }
