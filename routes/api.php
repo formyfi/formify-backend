@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    UserController,StationController, PartController, ChecklistController
+    UserController,StationController, PartController, ChecklistController, FileController
 };
 
 /*
@@ -22,6 +22,10 @@ use App\Http\Controllers\{
 
 Route::post('/auth/login', [UserController::class, 'login_user']);
 Route::post('/auth/admin_registration', [UserController::class, 'create_admin_user']);
+
+Route::post('/file/upload', [FileController::class, 'upload']);
+
+
 
 Route::group(['middleware' => ['auth:sanctum']], function(){
     
