@@ -77,6 +77,16 @@ class Users extends Model {
             return (count($results) > 0) ? $results : false;
     }
 
+    public static function get_stations_by_user_id(Int $id){
+       
+        $results = DB::select("SELECT s.id AS station_id, s.name, s.id AS value
+            FROM user_station us
+            JOIN stations s ON (s.id = us.station_id)
+            WHERE us.user_id = ?", [$id]);
+        
+        return (count($results) > 0) ? $results : false;
+    }
+
     public static function get_org_details(Int $org_id){
        
         $results = DB::select("SELECT *

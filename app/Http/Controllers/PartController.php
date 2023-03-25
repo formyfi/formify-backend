@@ -5,6 +5,9 @@ use App\Services\PartService;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Models\{
+    Part,
+  };
 
 class PartController extends Controller
 {
@@ -17,6 +20,30 @@ class PartController extends Controller
 
         if(!empty($list)){
             return response()->json(['success' => true, 'part_list' => $list]);
+        } else return response()->json(['success' => false]);
+    }
+
+    public function get_parts_by_station(Request $request){
+        $station_id = $request->input('station_id');
+
+        if(empty($station_id)) return response()->json(['success' => false]);
+        
+        $list = Part::get_parts_by_station((int)$station_id);
+
+        if(!empty($list)){
+            return response()->json(['success' => true, 'part_list' => $list]);
+        } else return response()->json(['success' => false]);
+    }
+
+    public function get_part_vnumbers(Request $request){
+        $part_id = $request->input('part_id');
+
+        if(empty($part_id)) return response()->json(['success' => false]);
+        
+        $list = Part::get_part_vnumbers((int)$part_id);
+
+        if(!empty($list)){
+            return response()->json(['success' => true, 'v_numbers' => $list]);
         } else return response()->json(['success' => false]);
     }
 

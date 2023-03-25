@@ -43,34 +43,6 @@ class Part extends Model {
             return true;
     }
 
-    public static function get_part_list(Int $org_id){
-    
-            $results = DB::select("SELECT s.*, s.id AS value, s.name AS label, GROUP_CONCAT(pv.v_num) AS v_numbers
-                FROM parts s
-                LEFT JOIN part_vnumber pv ON (pv.part_id = s.id) 
-                WHERE s.org_id = ? GROUP BY s.id", [$org_id]);
-            
-            return (count($results) > 0) ? $results : false;
-    }
-
-    public static function get_part_vnumbers(Int $part_id){
-    
-        $results = DB::select("SELECT pv.v_num
-            FROM part_vnumber pv 
-            WHERE pv.part_id = ?", [$part_id]);
-        
-        return (count($results) > 0) ? $results : false;
-    }
-
-    public static function get_parts_by_station(Int $station_id){
-    
-        $results = DB::select("SELECT p.*, p.id AS value, p.name AS label
-            FROM parts p
-            WHERE p.station_id = ?", [$station_id]);
-        
-        return (count($results) > 0) ? $results : false;
-    }
-
     public static function delete_part(Array $where){
     
         DB::table('parts')

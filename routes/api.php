@@ -22,13 +22,16 @@ use App\Http\Controllers\{
 
 Route::post('/auth/login', [UserController::class, 'login_user']);
 Route::post('/auth/admin_registration', [UserController::class, 'create_admin_user']);
+Route::post('/auth/logout', [UserController::class, 'logout']);
 
 Route::post('/file/upload', [FileController::class, 'upload']);
 
 
 
 Route::group(['middleware' => ['auth:sanctum']], function(){
-    
+    //logout
+   // Route::post('/auth/logout', [UserController::class, 'logout']);
+
     //Users Get
     Route::get('/users/get_users', [UserController::class, 'get_users']);
     
@@ -46,6 +49,8 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
     //Parts Get
     Route::get('/parts/get_part_list', [PartController::class, 'get_part_list']);
+    Route::get('/parts/get_parts_by_station', [PartController::class, 'get_parts_by_station']);
+    Route::get('/parts/get_part_vnumbers', [PartController::class, 'get_part_vnumbers']);
 
     //Parts Post
     Route::post('/parts/upsert_part', [PartController::class, 'upsert_part']);
