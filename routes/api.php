@@ -45,6 +45,8 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
     //Parts Get
     Route::get('/parts/get_part_list', [PartController::class, 'get_part_list']);
+    Route::get('/parts/get_parts_by_station', [PartController::class, 'get_parts_by_station']);
+    Route::get('/parts/get_part_vnumbers', [PartController::class, 'get_part_vnumbers']);
 
     //Parts Post
     Route::post('/parts/upsert_part', [PartController::class, 'upsert_part']);
