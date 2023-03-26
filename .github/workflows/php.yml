@@ -19,16 +19,6 @@ jobs:
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
-    - name: Deploy file
-      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-      with:
-        username: root
-        server: 159.203.15.162
-        port: 22
-        local_path: '.'
-        remote_path: '/var/www/html'
-        sftp_only: true
-        password: formY5@project
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v3
@@ -39,3 +29,9 @@ jobs:
           ${{ runner.os }}-php-
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ftp.sru.jdh.mybluehost.me
+        username: git@sru.jdh.mybluehost.me
+        password: hello@123456
