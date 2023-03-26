@@ -2,7 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\{
+    UserController,StationController, PartController, ChecklistController, FileController
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -20,11 +22,49 @@ use App\Http\Controllers\UserController;
 
 Route::post('/auth/login', [UserController::class, 'login_user']);
 Route::post('/auth/admin_registration', [UserController::class, 'create_admin_user']);
-//Route::get('authentication/login', ['uses' => 'Authentication/UserController@user_login']);
+Route::post('/auth/logout', [UserController::class, 'logout']);
+
+Route::post('/file/upload', [FileController::class, 'upload']);
+
+
 
 Route::group(['middleware' => ['auth:sanctum']], function(){
-    
+    //logout
+   // Route::post('/auth/logout', [UserController::class, 'logout']);
+
+    //Users Get
     Route::get('/users/get_users', [UserController::class, 'get_users']);
-    Route::post('/auth/register', [UserController::class, 'create_user']);
-    Route::post('/auth/update_user', [UserController::class, 'update_user']);
+    
+   // Users Post
+   Route::post('/users/create_user', [UserController::class, 'create_user']);
+   Route::post('/users/update_user', [UserController::class, 'update_user']);
+   Route::post('/users/delete_user', [UserController::class, 'delete_user']);
+
+   // Stations Get
+    Route::get('/stations/get_station_list', [StationController::class, 'get_station_list']);
+   
+   // Station Post   
+    Route::post('/stations/upsert_station', [StationController::class, 'upsert_station']);
+    Route::post('/stations/delete_station', [StationController::class, 'delete_station']); 
+
+    //Parts Get
+    Route::get('/parts/get_part_list', [PartController::class, 'get_part_list']);
+    Route::get('/parts/get_parts_by_station', [PartController::class, 'get_parts_by_station']);
+    Route::get('/parts/get_part_vnumbers', [PartController::class, 'get_part_vnumbers']);
+
+    //Parts Post
+    Route::post('/parts/upsert_part', [PartController::class, 'upsert_part']);
+    Route::post('/parts/delete_part', [PartController::class, 'delete_part']);
+
+    //Checklists Get
+    Route::get('/checklist/get_checklists', [ChecklistController::class, 'get_checklists']);
+
+    //Checklists Posts
+    Route::post('/checklist/upsert_checklist', [ChecklistController::class, 'upsert_checklist']);
+    Route::post('/checklist/upsert_checklist_form', [ChecklistController::class, 'upsert_checklist_form']);
+    Route::post('/checklist/delete_checklist', [ChecklistController::class, 'delete_checklist']);
 });
+
+
+
+

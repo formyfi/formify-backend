@@ -10,8 +10,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-
-
+use App\Http\Models\{
+    Users
+  };
 class UserController extends Controller
 {
    /**
@@ -22,26 +23,25 @@ class UserController extends Controller
     public function create_user(Request $request){
 
             $user_details = $request->input('user_details');
+            $org_id = $request->input('org_id');
 
-            if(empty($user_details['user_name'] || empty($user_details['user_type']) || empty($user_details['org_id']) || empty($user_details['password']) || $user_details['first_name'])) return response()->json(['success' => false]);
+            if(empty($user_details['user_name'] || empty($user_details['user_type']) || empty($org_id) || empty($user_details['password']) || $user_details['first_name'])) return response()->json(['success' => false]);
 
-                $user_details['password'] = Hash::make($user_details['password']);
-                $id = UserServices::insert_user($user_details);
+            $user_details['password'] = Hash::make($user_details['password']);
+            $user_details['org_id'] = $org_id;
+            $id = UserServices::insert_user($user_details);
+            $list = UserServices::get_users_list((int)$org_id);
+    
+            if(!empty($list)){
+                return response()->json(['success' => true, 'user_list' => $list]);
+            } else return response()->json(['success' => true]);
 
-                if(!empty($id)){
-                    return response()->json([
-                        'success' => true,
-                        'user_id' => $id,
-                        'message' => 'User created successfully',
-                    ]);
-                } else return response()->json(['success' => false]);
-               
-            
     }
 
     public function create_admin_user(Request $request){
 
         $user_details = $request->input('user_details');
+
 
         if(empty($user_details['user_name'] || empty($user_details['user_type']) || empty($user_details['org_id']) || empty($user_details['password']) || $user_details['first_name'])) return response()->json(['success' => false]);
 
@@ -73,7 +73,7 @@ class UserController extends Controller
 
             if($validateUser->fails()){
                 return response()->json([
-                    'status' => false,
+                    'success' => false,
                     'message' => 'validation error',
                     'errors' => $validateUser->errors()
                 ], 401);
@@ -81,23 +81,29 @@ class UserController extends Controller
 
             if(!Auth::attempt($request->only(['user_name', 'password']))){
                 return response()->json([
-                    'status' => false,
+                    'success' => false,
                     'message' => 'User_name & Password does not match with our record.',
                 ], 401);
             }
 
             $user = User::where('user_name', $request->user_name)->first();
-
+            $org_detail = Users::get_org_details((int)$user-> org_id);
+            $stations = Users::get_stations_by_user_id((int)$user-> id);
             return response()->json([
-                'status' => true,
+                'success' => true,
                 'message' => 'User Logged In Successfully',
                 'user_id' => $user['id'],
+                'org_id' => $user['org_id'],
+                'user_type_id' => $user['user_type'],
+                'user_details' => $user,
+                'stations' => $stations,
+                'org_name' =>  $org_detail?$org_detail->org_name:'-',
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ], 200);
 
         } catch (\Throwable $th) {
             return response()->json([
-                'status' => false,
+                'success' => false,
                 'message' => $th->getMessage()
             ], 500);
         }
@@ -118,6 +124,7 @@ class UserController extends Controller
 
     public function update_user(Request $request){
         $user_details = $request->input('user_details');
+        $org_id = $request->input('org_id');
 
         if(empty($user_details['id'])) return response()->json(['success' => false]);
 
@@ -126,7 +133,35 @@ class UserController extends Controller
 
         UserServices::update_user_details_by_id($user_details);
 
-        return response()->json(['success' => true]);
+        $list = UserServices::get_users_list((int)$org_id);
         
+        if(!empty($list)){
+            return response()->json(['success' => true, 'user_list' => $list]);
+        } else   return response()->json(['success' => true]);
+
+      
+        
+    }
+
+    public function delete_user(Request $request){
+        $id = $request->input('id');
+        $org_id = $request->input('org_id');
+
+        if(empty($id)) return response()->json(['success' => false]);
+
+        UserServices::delete_user(['id' => $id]);
+        
+        $list = UserServices::get_users_list((int)$org_id);
+        
+        if(!empty($list)){
+            return response()->json(['success' => true, 'user_list' => $list]);
+        } else return response()->json(['success' => true]);
+        
+    }
+
+    public static function logout(){
+       Auth::user()->currentAccessToken()->delete();
+
+       return response()->json(['success' => true]);
     }
 }
