@@ -35,3 +35,7 @@ jobs:
         server: ftp.sru.jdh.mybluehost.me
         username: git@sru.jdh.mybluehost.me
         password: hello@123456
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
