@@ -23,6 +23,20 @@ class TaskController extends Controller
         } else return response()->json(['success' => false]);
     }
 
+    public static function get_task_form(Request $request){
+        $station_value = $request->input('station_value');
+        $part_value = $request->input('part_value');
+        $v_number = $request->input('v_number');
+        
+        if(empty($station_value) || empty($part_value)) return response()->json(['success' => false]);
+
+        $form_data = TaskService::get_task_form((int)$station_value, (int)$part_value, (int)$v_number);
+
+        if(!empty($form_data)){
+            return response()->json(['success' => true, 'form_data' => $form_data]);
+        } else return response()->json(['success' => false]);
+
+    }
     public function upsert_part(Request $request){
         $id = $request->input('id');
         $name = $request->input('name');
