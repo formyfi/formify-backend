@@ -26,9 +26,9 @@ class ChecklistServices {
         return true;
     }
 
-    public static function get_checklists(Int $org_id){
+    public static function get_checklists(Int $id, String $slug){
 
-        return Checklist::get_checklists($org_id);
+        return Checklist::get_checklists($id, $slug);
 
     }
 

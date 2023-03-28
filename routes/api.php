@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    UserController,StationController, PartController, ChecklistController, FileController
+    UserController,StationController, PartController, ChecklistController, FileController, TaskController
 };
 
 /*
@@ -63,6 +63,10 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::post('/checklist/upsert_checklist', [ChecklistController::class, 'upsert_checklist']);
     Route::post('/checklist/upsert_checklist_form', [ChecklistController::class, 'upsert_checklist_form']);
     Route::post('/checklist/delete_checklist', [ChecklistController::class, 'delete_checklist']);
+
+    //Tasks Get
+    Route::get('/tasks/get_task_form', [TaskController::class, 'get_task_form']);
+    
 });
 
 

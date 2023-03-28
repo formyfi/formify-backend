@@ -89,6 +89,7 @@ class UserController extends Controller
             $user = User::where('user_name', $request->user_name)->first();
             $org_detail = Users::get_org_details((int)$user-> org_id);
             $stations = Users::get_stations_by_user_id((int)$user-> id);
+            if(!empty($stations)) $stations = array_values($stations);
             return response()->json([
                 'success' => true,
                 'message' => 'User Logged In Successfully',

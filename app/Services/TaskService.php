@@ -1,7 +1,7 @@
 <?php namespace App\Services;
 
 use App\Http\Models\{
-  Part,
+  Part, Checklist, Task
 };
 
 use Illuminate\Support\Facades\{
@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\{
 };
 
 
-class PartService { 
+class TaskService { 
 
     public static function insert_part(Array $part_details){
         $v_numbers = '';
@@ -45,9 +45,14 @@ class PartService {
         return true;
     }
 
-    public static function get_part_list(Int $org_id){
+    public static function get_task_form($station_value, $part_value, $v_number){
+      $form_data = [];
+      
+      if(!empty($v_number))$form_data =  Task::get_task_entry($station_value, $part_value, $v_number);
 
-        return Part::get_part_list($org_id);
+      if(empty($task_json))$form_data = Checklist::get_checklist_form(0, $station_value, $part_value);
+
+      return $form_data;
 
     }
 
