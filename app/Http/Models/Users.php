@@ -44,7 +44,7 @@ class Users extends Model {
                 return ($insert_id) ? $insert_id : false;
             } else {
                 DB::table('users')
-                ->where('id','=',$exisiting_entry[0][id])
+                ->where('id','=',$exisiting_entry[0]['id'])
                 ->update($update_params);
 
             return true;
