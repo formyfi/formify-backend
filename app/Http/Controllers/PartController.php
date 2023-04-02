@@ -57,8 +57,8 @@ class PartController extends Controller
 
         if(empty($name)) return response()->json(['success' => true]);
 
-        if(empty($id))  PartService::insert_part(['name' => $name, 'description' => $description, 'org_id' => $org_id, 'station_id' => $station_value, 'v_numbers' => $v_numbers]);
-        else PartService::update_part(['name' => $name, 'description' => $description, 'station_id' => $station_value, 'v_numbers' => $v_numbers], ['id' => $id]);
+        if(empty($id))  PartService::upsert_part(['name' => $name, 'description' => $description, 'org_id' => $org_id, 'station_id' => $station_value, 'v_numbers' => $v_numbers]);
+        else PartService::upsert_part(['name' => $name, 'description' => $description, 'station_id' => $station_value, 'v_numbers' => $v_numbers], ['id' => $id]);
         
         $list = PartService::get_part_list((int)$org_id);
         if(!empty($list)){

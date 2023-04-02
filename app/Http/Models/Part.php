@@ -30,6 +30,15 @@ class Part extends Model {
 
     }
 
+    public static function upsert_part_station(Array $update_params){
+
+        $insert_id = DB::table('part_station')
+        ->insertGetId($update_params);
+
+        return ($insert_id) ? $insert_id : false;
+          
+    }
+
     public static function upsert_part_vnumber(Array $update_params){
 
         
@@ -45,10 +54,11 @@ class Part extends Model {
 
     public static function get_part_list(Int $org_id){
     
-            $results = DB::select("SELECT s.*, s.id AS value, s.name AS label, GROUP_CONCAT(pv.v_num) AS v_numbers
-                FROM parts s
-                LEFT JOIN part_vnumber pv ON (pv.part_id = s.id) 
-                WHERE s.org_id = ? GROUP BY s.id", [$org_id]);
+            $results = DB::select("SELECT pt.*, pt.id AS value, pt.name AS label, GROUP_CONCAT(DISTINCT pv.v_num) AS v_numbers, GROUP_CONCAT(DISTINCT ps.station_id) AS station_id
+                FROM parts pt
+                LEFT JOIN part_vnumber pv ON (pv.part_id = pt.id)
+                LEFT JOIN part_station ps ON (ps.part_id = pt.id)
+                WHERE pt.org_id = ? GROUP BY pt.id", [$org_id]);
             
             return (count($results) > 0) ? $results : false;
     }
@@ -66,7 +76,8 @@ class Part extends Model {
     
         $results = DB::select("SELECT p.*, p.id AS value, p.name AS label
             FROM parts p
-            WHERE p.station_id = ?", [$station_id]);
+            JOIN part_station ps ON (ps.part_id = p.id)
+            WHERE ps.station_id = ?", [$station_id]);
         
         return (count($results) > 0) ? $results : false;
     }
@@ -80,4 +91,14 @@ class Part extends Model {
             return true;
     }
 
+    public static function delete_part_station(Array $where){
+    
+        DB::table('part_station')
+        ->where($where)
+        ->delete();
+
+            return true;
+    }
+
+   
 }

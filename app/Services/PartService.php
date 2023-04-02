@@ -11,38 +11,45 @@ use Illuminate\Support\Facades\{
 
 class PartService { 
 
-    public static function insert_part(Array $part_details){
-        $v_numbers = '';
-        if(!empty($part_details['v_numbers'])) $v_numbers = $part_details['v_numbers'];
-        unset($part_details['v_numbers']);
-
-        $part_id =  Part::upsert_part($part_details);
-
-        if(!empty($part_id) && !empty($v_numbers)){
-          $v_numbers = explode(',', $v_numbers);
-            foreach ($v_numbers as $key => $v_number) {
-              Part::upsert_part_vnumber(['part_id' => $part_id, 'v_num' => $v_number]);
-            }
-        } 
-       return $part_id;
-    }
-
-    public static function update_part(Array $part_details, Array $where){
+    public static function upsert_part(Array $part_details, Array $where = []){
       
         $v_numbers = '';
         if(!empty($part_details['v_numbers'])) $v_numbers = $part_details['v_numbers'];
+        if(!empty($part_details['station_id'])) $station_ids = $part_details['station_id'];
         unset($part_details['v_numbers']);
+        unset($part_details['station_id']);
+        $part_id = null;
+
+        if(empty($where)){
+          $part_id =  Part::upsert_part($part_details);
+            if(!empty($part_id) && !empty($v_numbers)){
+              $v_numbers = explode(',', $v_numbers);
+                foreach ($v_numbers as $key => $v_number) {
+                  Part::upsert_part_vnumber(['part_id' => $part_id, 'v_num' => $v_number]);
+                }
+            } 
+        } else{
+          Part::upsert_part($part_details, $where);
+          if(!empty($where['id']) && !empty($v_numbers)){
+            $v_numbers = explode(',', $v_numbers);
+            foreach ($v_numbers as $key => $v_number) {
+              Part::upsert_part_vnumber(['part_id' => $where['id'], 'v_num' => $v_number]);
+            }
+          } 
+          $part_id = $where['id'];
+        }
         
-        Part::upsert_part($part_details, $where);
 
-        if(!empty($where['id']) && !empty($v_numbers)){
-          $v_numbers = explode(',', $v_numbers);
-          foreach ($v_numbers as $key => $v_number) {
-            Part::upsert_part_vnumber(['part_id' => $where['id'], 'v_num' => $v_number]);
+        if(!empty($part_id) && !empty($station_ids)){
+          Part::delete_part_station(['part_id' => $part_id]);
+          foreach($station_ids AS $station_value){
+            $station_ids[] =  $station_value['id'];
+            Part::upsert_part_station(['part_id' => $part_id, 'station_id' => $station_value['id']]);
           }
-        } 
+   
+        }
 
-        return true;
+        return $part_id;
     }
 
     public static function get_part_list(Int $org_id){

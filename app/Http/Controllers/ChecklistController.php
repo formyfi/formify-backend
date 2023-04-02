@@ -5,6 +5,9 @@ use App\Services\ChecklistServices;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Models\{
+    Checklist,
+};
 
 class ChecklistController extends Controller
 {
@@ -44,16 +47,25 @@ class ChecklistController extends Controller
         $station_value = $request->input('station');
         $org_id = $request->input('org_id');
         $form_json = $request->input('form_json');
+        $unique_id = $request->input('unique_id');
 
-        if(empty($id)) return response()->json(['success' => false]);
-         $exist = ChecklistServices::get_checklists((int)$id, 'id');
-        if(empty($exist)) ChecklistServices::insert_checklist(['id'=> $id, 'title' => $title, 'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json]);
-        else ChecklistServices::update_checklist(['title' => $title, 'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json], ['id' => $id]);
-        
-        $list = ChecklistServices::get_checklists((int)$org_id, 'org');
-        if(!empty($list)){
-            return response()->json(['success' => true, 'checkilists' => $list]);
-        } else return response()->json(['success' => true]);
+        if(empty($id) || empty($unique_id )) return response()->json(['success' => false]);
+        $unique_exist =  Checklist::check_if_station_part_allocated($unique_id, $id);
+
+        if(!empty($unique_exist) && $unique_exist->id !== (int)$id){
+
+            return response()->json(['success' => false, 'message' => "Station <=> Part pair is already assigned to form ID: ".$id]);
+        } else {
+            $exist = ChecklistServices::get_checklists((int)$id, 'id');
+            if(empty($exist)) ChecklistServices::insert_checklist(['id'=> $id, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json]);
+            else ChecklistServices::update_checklist(['title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json], ['id' => $id]);
+            
+            $list = ChecklistServices::get_checklists((int)$org_id, 'org');
+            if(!empty($list)){
+                return response()->json(['success' => true, 'checkilists' => $list]);
+            } else return response()->json(['success' => true]);
+        }
+       
     }
 
     public function upsert_checklist_form(Request $request){

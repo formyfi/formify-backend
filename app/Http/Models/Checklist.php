@@ -35,8 +35,15 @@ class Checklist extends Model {
         
         if($slug === 'org') $results = DB::select("SELECT s.*, s.id, st.name as station_name, pt.name as part_name FROM forms s LEFT JOIN stations st ON st.id=s.station_id LEFT JOIN parts pt ON pt.id=s.part_id  WHERE s.org_id = ? GROUP BY s.id", [$id]);
             
-            return (count($results) > 0) ? $results : false;
+        return (count($results) > 0) ? $results : false;
     }
+
+    public static function check_if_station_part_allocated(String $unique_id){
+        
+        $results = DB::select("SELECT f.id FROM forms f WHERE f.unique_id = ?", [$unique_id]);
+  
+        return (count($results) > 0) ? $results[0] : false;
+      }
 
     public static function get_checklist_form(Int $id, Int $station_id = null, Int $part_id = null){
         $where = "WHERE id = ?";
