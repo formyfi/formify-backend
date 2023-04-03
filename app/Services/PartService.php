@@ -14,6 +14,7 @@ class PartService {
     public static function upsert_part(Array $part_details, Array $where = []){
       
         $v_numbers = '';
+        $station_ids= null;
         if(!empty($part_details['v_numbers'])) $v_numbers = $part_details['v_numbers'];
         if(!empty($part_details['station_id'])) $station_ids = $part_details['station_id'];
         unset($part_details['v_numbers']);

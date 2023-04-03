@@ -54,7 +54,7 @@ class Checklist extends Model {
         }
         $results = DB::select("SELECT form_json FROM forms $where",  $params);
         
-        return (count($results) > 0) ? $results[0] : false;
+        return (count($results) > 0) ? $results[0]->form_json : false;
     }
 
     public static function delete_checklist(Array $where){
