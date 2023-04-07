@@ -85,12 +85,20 @@ CREATE TABLE `forms` (
   `station_id` int DEFAULT NULL,
   `part_id` int DEFAULT NULL,
   `form_json` text,
+  `unique_id` varchar(200) DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=659875 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+DROP TABLE IF EXISTS `part_station`;
 
+CREATE TABLE `part_station` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `part_id` int DEFAULT NULL,
+  `station_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 # Dump of table migrations
 # ------------------------------------------------------------
