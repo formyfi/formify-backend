@@ -23,7 +23,7 @@ class ChecklistController extends Controller
             $form = ChecklistServices::get_checklist_form((int)$id);
 
             if(!empty($form)){
-                return response()->json(['success' => true, 'data' => $form]);
+                return response()->json(['success' => true, 'data' => $form->form_json]);
             } else return response()->json(['success' => false]);
 
         } else {
@@ -54,7 +54,7 @@ class ChecklistController extends Controller
 
         if(!empty($unique_exist) && $unique_exist->id !== (int)$id){
 
-            return response()->json(['success' => false, 'message' => "Station <=> Part pair is already assigned to form ID: ".$id]);
+            return response()->json(['success' => false, 'message' => "Station <=> Part pair is already assigned to form ID: ".$unique_exist->id]);
         } else {
             $exist = ChecklistServices::get_checklists((int)$id, 'id');
             if(empty($exist)) ChecklistServices::insert_checklist(['id'=> $id, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json]);
@@ -79,6 +79,35 @@ class ChecklistController extends Controller
         $list = ChecklistServices::get_checklists((int)$org_id, 'org');
         if(!empty($list)){
             return response()->json(['success' => true, 'checkilists' => $list]);
+        } else return response()->json(['success' => true]);
+    }
+
+    public function upsert_checklist_form_template(Request $request){
+        $id = $request->input('id');
+        $org_id = $request->input('org_id');
+        $form_json = $request->input('form_json');
+        $form_name = $request->input('form_name');
+
+        if(empty($org_id) || empty($form_name)) return response()->json(['success' => false]); 
+
+        if(!empty($id)) Checklist::update_template(['form_json' => $form_json], ['id' => $id]);
+        else Checklist::insert_template(['name' => $form_name, 'org_id' => $org_id, 'form_json' => json_encode($form_json)]);
+
+        $list = Checklist::get_templates((int)$org_id);
+
+        if(!empty($list)){
+            return response()->json(['success' => true, 'templates' => $list]);
+        } else return response()->json(['success' => true]);
+    }
+
+    public function get_templates(Request $request){
+        $org_id = $request->input('org_id');
+       
+        if(empty($org_id)) return response()->json(['success' => false]); 
+        $list = Checklist::get_templates((int)$org_id);
+
+        if(!empty($list)){
+            return response()->json(['success' => true, 'templates' => $list]);
         } else return response()->json(['success' => true]);
     }
 

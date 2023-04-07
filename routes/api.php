@@ -58,10 +58,12 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
     //Checklists Get
     Route::get('/checklist/get_checklists', [ChecklistController::class, 'get_checklists']);
+    Route::get('/checklist/get_templates', [ChecklistController::class, 'get_templates']);
 
     //Checklists Posts
     Route::post('/checklist/upsert_checklist', [ChecklistController::class, 'upsert_checklist']);
     Route::post('/checklist/upsert_checklist_form', [ChecklistController::class, 'upsert_checklist_form']);
+    Route::post('/checklist/upsert_checklist_form_template', [ChecklistController::class, 'upsert_checklist_form_template']);
     Route::post('/checklist/delete_checklist', [ChecklistController::class, 'delete_checklist']);
 
     //Tasks Get

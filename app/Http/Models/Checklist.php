@@ -28,6 +28,26 @@ class Checklist extends Model {
 
     }
 
+    public static function update_template(Array $update_params, Array $where_params){
+
+            DB::table('form_templates')
+            ->where($where_params)
+            ->update($update_params);
+
+            return true;
+      
+
+    }
+    
+    public static function insert_template($update_params){
+
+      
+            $insert_id = DB::table('form_templates')
+            ->insertGetId($update_params);
+            return ($insert_id) ? $insert_id : false;
+        
+
+    }
 
     public static function get_checklists(Int $id, String $slug){
 
@@ -38,6 +58,14 @@ class Checklist extends Model {
         return (count($results) > 0) ? $results : false;
     }
 
+    public static function get_templates(Int $org_id){
+
+    $results = DB::select("SELECT fs.* FROM form_templates fs WHERE fs.org_id = ?", [$org_id]);
+            
+        return (count($results) > 0) ? $results : false;
+    }
+
+    
     public static function check_if_station_part_allocated(String $unique_id){
         
         $results = DB::select("SELECT f.id FROM forms f WHERE f.unique_id = ?", [$unique_id]);
@@ -52,9 +80,9 @@ class Checklist extends Model {
             $where = "WHERE station_id = ? AND part_id = ?";
             $params = [$station_id, $part_id];
         }
-        $results = DB::select("SELECT form_json FROM forms $where",  $params);
+        $results = DB::select("SELECT id, form_json FROM forms $where",  $params);
         
-        return (count($results) > 0) ? $results[0]->form_json : false;
+        return (count($results) > 0) ? $results[0] : false;
     }
 
     public static function delete_checklist(Array $where){
