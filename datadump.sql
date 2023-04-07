@@ -328,11 +328,24 @@ CREATE TABLE `workflow_mapping` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+# Dump of table form_templates
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `form_templates`;
+
+CREATE TABLE `form_templates` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) DEFAULT NULL,
+  `org_id` int DEFAULT NULL,
+  `form_json` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+INSERT INTO `form_templates` (`id`, `name`, `org_id`, `form_json`)
+VALUES
+	(2,'test',8,'[{\"type\":\"number\",\"required\":false,\"label\":\"Number\",\"className\":\"form-control\",\"name\":\"number-1680804416330-0\",\"access\":false},{\"type\":\"file\",\"required\":false,\"label\":\"File Upload\",\"className\":\"form-control\",\"name\":\"file-1680804416676-0\",\"access\":false},{\"type\":\"textarea\",\"required\":false,\"label\":\"Text Area\",\"className\":\"form-control\",\"name\":\"textarea-1680804417573-0\",\"access\":false},{\"type\":\"number\",\"required\":false,\"label\":\"Number\",\"className\":\"form-control\",\"name\":\"number-1680804417921-0\",\"access\":false},{\"type\":\"number\",\"required\":false,\"label\":\"Number\",\"className\":\"form-control\",\"name\":\"number-1680804418103-0\",\"access\":false},{\"type\":\"date\",\"required\":false,\"label\":\"Date Field\",\"className\":\"form-control\",\"name\":\"date-1680804418450-0\",\"access\":false}]');
+
+
+
