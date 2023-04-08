@@ -28,11 +28,22 @@ DROP TABLE IF EXISTS `checklist_data`;
 CREATE TABLE `checklist_data` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `checklist_vnum_record_id` int DEFAULT NULL,
+  `last_updated_id` int DEFAULT NULL,
   `form_data` text,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+LOCK TABLES `checklist_data` WRITE;
+/*!40000 ALTER TABLE `checklist_data` DISABLE KEYS */;
 
+INSERT INTO `checklist_data` (`id`, `checklist_vnum_record_id`, `last_updated_id`, `form_data`, `updated_at`, `created_at`)
+VALUES
+	(1, 1, 19, '[]', '2023-04-08 00:04:49', '2023-04-08 00:05:12');
+
+/*!40000 ALTER TABLE `checklist_data` ENABLE KEYS */;
+UNLOCK TABLES;
 
 # Dump of table checklist_vnum_record
 # ------------------------------------------------------------
@@ -51,7 +62,16 @@ CREATE TABLE `checklist_vnum_record` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+LOCK TABLES `checklist_data` WRITE;
+/*!40000 ALTER TABLE `checklist_data` DISABLE KEYS */;
 
+INSERT INTO `checklist_vnum_record` (`id`, `form_id`, `station_id`, `part_id`, `vnum_id`, `org_id`, `compliance_ind`, `created_at`, `updated_at`)
+VALUES
+	(1, 65987, 1, 2, 5698, 8, 0, '2023-04-07 22:53:35', '2023-04-08 00:52:40'),
+	(2, 659874, 1, 3, 345, 8, 1, '2023-04-07 22:53:35', '2023-04-08 01:07:03');
+
+/*!40000 ALTER TABLE `checklist_data` ENABLE KEYS */;
+UNLOCK TABLES;
 
 # Dump of table form_mapping
 # ------------------------------------------------------------

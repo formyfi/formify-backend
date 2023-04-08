@@ -11,15 +11,16 @@ use App\Http\Models\{
 
 class TaskController extends Controller
 {
-    public function get_task_list(Request $request){
+    public function get_tasklists(Request $request){
         $org_id = $request->input('org_id');
+        $user_id = $request->input('user_id');
 
-        if(empty($org_id)) return response()->json(['success' => false]);
+        if(empty($org_id) || empty($user_id)) return response()->json(['success' => false]);
         
-        $list = TaskService::get_task_list((int)$org_id);
+        $list = Task::get_task_list((int)$org_id, (int)$user_id);
 
         if(!empty($list)){
-            return response()->json(['success' => true, 'part_list' => $list]);
+            return response()->json(['success' => true, 'task_lists' => $list]);
         } else return response()->json(['success' => false]);
     }
 
@@ -42,21 +43,22 @@ class TaskController extends Controller
         $id = $request->input('id');
         $form_id = $request->input('form_id');
         $part_id = $request->input('part_id');
-        $part_vnumber = $request->input('part_vnumber');
+        $part_vnumber = $request->input('part_vnum');
         $station_id = $request->input('station_id');
         $org_id = $request->input('org_id');
         $form_json = $request->input('form_json');
+        $user_id = $request->input('user_id');
 
         if(empty($form_id) || empty($part_vnumber) || empty($form_json)) return response()->json(['success' => false]);
         
         if(!empty($id)){
-            Task::update_checklist_task_data(['form_data' => $form_json], ['id' => $id]);
+            Task::update_checklist_task_data(['form_data' => $form_json, 'last_updated_id' => $user_id], ['id' => $id]);
             return response()->json(['success' => true]);
         } else {
            $record_id = Task::insert_checklist_task_record(['form_id'=> $form_id, 'part_id' => $part_id, 'vnum_id' => $part_vnumber,'station_id' => $station_id, 'org_id' => $org_id]);
            
            if(!empty($record_id)){
-            Task::insert_checklist_task_data(['checklist_vnum_record_id' => $record_id,'form_data' => $form_json]);
+            Task::insert_checklist_task_data(['checklist_vnum_record_id' => $record_id,'form_data' => $form_json, 'last_updated_id' => $user_id]);
            }
            return response()->json(['success' => true]);
         }
