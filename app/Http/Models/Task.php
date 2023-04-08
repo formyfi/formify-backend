@@ -47,7 +47,7 @@ class Task extends Model {
     public static function insert_checklist_task_record(Array $update_params){
 
         
-            $exist = DB::select("SELECT id FROM checklist_vnum_record WHERE form_id = ? AND vnum_id = ?", [$update_params['form_id'], $update_params['vnum_id']]);
+            $exist = DB::select("SELECT id FROM checklist_vnum_record WHERE form_id = ? AND vnum_id = ?", [$update_params['form_id'], $update_params['vnum_id']])->first();
            
            if(empty($exist)){
             $insert_id = DB::table('checklist_vnum_record')
