@@ -25,7 +25,6 @@ class TimelineController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'user_id' => 'required',
             'form_vnumber_id' => 'required',
             'type' => 'required',
             'text' => 'required',
