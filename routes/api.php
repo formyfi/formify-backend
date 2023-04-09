@@ -75,9 +75,9 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     
 
     // create timelines
-    Route::get('/timelines', [TaskController::class, 'store']);
+    Route::get('/timelines', [TimelineController::class, 'store']);
     // list timelines
-    Route::post('/timelines', [TaskController::class, 'index']);
+    Route::post('/timelines', [TimelineController::class, 'index']);
 
 });
 
