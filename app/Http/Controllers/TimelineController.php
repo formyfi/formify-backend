@@ -16,7 +16,9 @@ class TimelineController extends Controller
        $timelines = DB::table('timelines')
                 ->leftJoin('users', 'users.id', '=', 'timelines.user_id')
                 ->select('timelines.*', 'users.first_name', 'users.last_name')
-                ->where(['form_vnumber_id'=> $vnumberId])->get();
+                ->where(['form_vnumber_id'=> $vnumberId])
+                ->orderBy('timelines.id', 'desc')
+                ->get();
         return response()->json(['data' => $timelines]);
 
     }
