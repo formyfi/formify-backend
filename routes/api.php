@@ -75,7 +75,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     
 
     // create timelines
-    Route::get('/timelines', [TimelineController::class, 'index']);
+    Route::get('/timelines/{form_vnumber_id}', [TimelineController::class, 'index']);
     // list timelines
     Route::post('/timelines', [TimelineController::class, 'store']);
 

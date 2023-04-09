@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Timeline;
 use Illuminate\Http\Request;
+use DB;
 
 class TimelineController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-       $timelines = DB::table('timelines')->get();
+        $vnumberId = $request->form_vnumber_id;
+       $timelines = DB::table('timelines')->where(['form_vnumber_id'=> $vnumberId])->get();
         return response()->json(['data' => $timelines]);
 
     }
