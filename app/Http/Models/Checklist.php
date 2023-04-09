@@ -53,7 +53,7 @@ class Checklist extends Model {
 
         if($slug === 'id') $results = DB::select("SELECT s.* FROM forms s WHERE s.id = ?", [$id]);
         
-        if($slug === 'org') $results = DB::select("SELECT s.*, s.id, st.name as station_name, pt.name as part_name FROM forms s LEFT JOIN stations st ON st.id=s.station_id LEFT JOIN parts pt ON pt.id=s.part_id  WHERE s.org_id = ? GROUP BY s.id", [$id]);
+        if($slug === 'org') $results = DB::select("SELECT s.*, st.name as station_name, pt.name as part_name FROM forms s LEFT JOIN stations st ON st.id=s.station_id LEFT JOIN parts pt ON pt.id=s.part_id  WHERE s.org_id = ? GROUP BY s.id, st.id, pt.id", [$id]);
             
         return (count($results) > 0) ? $results : false;
     }

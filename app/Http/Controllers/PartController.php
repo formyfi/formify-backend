@@ -37,10 +37,12 @@ class PartController extends Controller
 
     public function get_part_vnumbers(Request $request){
         $part_id = $request->input('part_id');
+        $station_id = $request->input('station_id');
+        $org_id = $request->input('org_id');
 
         if(empty($part_id)) return response()->json(['success' => false]);
         
-        $list = Part::get_part_vnumbers((int)$part_id);
+        $list = Part::get_part_vnumbers((int)$part_id, (int)$station_id, (int)$org_id);
 
         if(!empty($list)){
             return response()->json(['success' => true, 'v_numbers' => $list]);
