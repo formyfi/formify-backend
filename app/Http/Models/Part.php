@@ -63,11 +63,12 @@ class Part extends Model {
             return (count($results) > 0) ? $results : false;
     }
 
-    public static function get_part_vnumbers(Int $part_id){
+    public static function get_part_vnumbers(Int $part_id, Int $station_id, Int $org_id){
     
-        $results = DB::select("SELECT pv.v_num
-            FROM part_vnumber pv 
-            WHERE pv.part_id = ?", [$part_id]);
+        $results = DB::select("SELECT pv.v_num, CONCAT(pv.v_num, IF(cv.id IS NULL, '', IF(cv.compliance_ind = 1, ' (Inspected - Compliant)', ' (Inspected - Non Compliant)'))) AS v_num_label
+            FROM part_vnumber pv
+            LEFT JOIN checklist_vnum_record cv ON (cv.vnum_id = pv.v_num AND cv.station_id = ? AND cv.org_id = ?)
+            WHERE pv.part_id = ?", [$station_id, $org_id, $part_id]);
         
         return (count($results) > 0) ? $results : false;
     }
