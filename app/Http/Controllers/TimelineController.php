@@ -3,37 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Timeline;
+use App\Models\Timeline;
 use Illuminate\Http\Request;
 
 class TimelineController extends Controller
 {
     public function index()
     {
-        $timelines = Timeline::all();
+       $timelines = DB::table('timelines')->get();
         return response()->json(['data' => $timelines]);
-    }
 
-    public function show(Timeline $timeline)
-    {
-        return response()->json(['data' => $timeline]);
     }
-
     public function store(Request $request)
     {
-        $timeline = Timeline::create($request->all());
+        $data = $request->validate([
+            'user_id' => 'required',
+            'form_vnumber_id' => 'required',
+            'type' => 'required',
+            'text' => 'required',
+            'images' => 'nullable',
+        ]);
+
+        $data['created_at'] = now();
+        $timelineId = DB::table('timelines')->insertGetId($data);
+        $timeline = DB::table('timelines')->find($timelineId);
+
         return response()->json(['data' => $timeline], 201);
-    }
 
-    public function update(Request $request, Timeline $timeline)
-    {
-        $timeline->update($request->all());
-        return response()->json(['data' => $timeline]);
-    }
-
-    public function destroy(Timeline $timeline)
-    {
-        $timeline->delete();
-        return response()->json(['message' => 'Timeline deleted']);
     }
 }
