@@ -15,7 +15,6 @@ class TimelineController extends Controller
         $vnumberId = $request->form_vnumber_id;
        $timelines = DB::table('timelines')
                 ->leftJoin('users', 'users.id', '=', 'timelines.user_id')
-                ->leftJoin('users', 'users.id', '=', 'timelines.user_id')
                 ->select('timelines.*', 'users.first_name', 'users.last_name')
                 ->where(['form_vnumber_id'=> $vnumberId])->get();
         return response()->json(['data' => $timelines]);
