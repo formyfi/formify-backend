@@ -6,7 +6,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Models\{
-    Task,
+    Task,Checklist
   };
 
 class TaskController extends Controller
@@ -50,12 +50,51 @@ class TaskController extends Controller
         $user_id = $request->input('user_id');
 
         if(empty($form_id) || empty($part_vnumber) || empty($form_json)) return response()->json(['success' => false]);
+
+        if(!empty($form_json)){
+            $form_array = json_decode($form_json, true);
+            $is_compliant = 1;
+            if(!empty($form_array)){
+                foreach($form_array AS $fs){
+                    if($fs === 'fail'){
+                        $is_compliant = 0;
+                        break;
+                    }
+                }
+                if($is_compliant === 1){
+                    $data = Checklist::get_checklist_form($form_id);
+                    if(!empty($data)){
+                        $form = $data->form_json;
+                        $form = json_decode($form, true);
+                        if(!empty($form)){
+                            $is_break = false;
+                            foreach($form_array AS $key => $value){
+                                if(stristr($key, 'number')){
+                                    foreach($form AS $f){
+                                        if(!empty($f['name']) && $f['name'] === $key){
+                                            if((!empty($f['max']) && (int)$value > (int)$f['max']) || (!empty($f['min']) && (int)$value < (int)$f['min'])) {
+                                                $is_compliant = 0;
+                                                $is_break = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if($is_break === true) break;
+                            }
+                        }
+                    }  else {
+                        //Here if it comes here means actualy form is deleted but values exist. Add code to remove values
+                    }
+                }
+            } else $is_compliant = 0;
+        }
         
         if(!empty($id)){
             Task::update_checklist_task_data(['form_data' => $form_json, 'last_updated_id' => $user_id], ['id' => $id]);
             return response()->json(['success' => true, "update" => true]);
         } else {
-           $record_id = Task::insert_checklist_task_record(['form_id'=> $form_id, 'part_id' => $part_id, 'vnum_id' => $part_vnumber,'station_id' => $station_id, 'org_id' => $org_id]);
+           $record_id = Task::insert_checklist_task_record(['form_id'=> $form_id, 'part_id' => $part_id, 'compliance_ind' => $is_compliant ,'vnum_id' => $part_vnumber,'station_id' => $station_id, 'org_id' => $org_id]);
            
            if(!empty($record_id)){
             Task::insert_checklist_task_data(['checklist_vnum_record_id' => $record_id,'form_data' => $form_json, 'last_updated_id' => $user_id]);

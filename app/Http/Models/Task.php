@@ -11,7 +11,7 @@ class Task extends Model {
 
     public static function get_task_entry(Int $station_value, Int $part_value, Int $v_number){
 
-        $form_data = DB::select("SELECT cd.form_data FROM checklist_vnum_record cv JOIN checklist_data cd ON (cd.checklist_vnum_record_id = cv.id) WHERE cv.station_id = ? AND cv.part_id = ? AND cv.vnum_id=?", [$station_value, $part_value, $v_number]);
+        $form_data = DB::select("SELECT cd.form_data, cv.id FROM checklist_vnum_record cv JOIN checklist_data cd ON (cd.checklist_vnum_record_id = cv.id) WHERE cv.station_id = ? AND cv.part_id = ? AND cv.vnum_id=?", [$station_value, $part_value, $v_number]);
 
         return (count($form_data) > 0) ? $form_data[0]->form_data: false;
     }
@@ -57,16 +57,34 @@ class Task extends Model {
             $insert_id = DB::table('checklist_vnum_record')
             ->insertGetId($update_params);
             return $insert_id;
-           } else return $exist[0]->id;
+           } else {
+            $where_params = ['id' => $exist[0]->id];
+            DB::table('checklist_vnum_record')
+            ->where($where_params)
+            ->update($update_params);
+            return $exist[0]->id;
+           } 
             
     }
 
     public static function insert_checklist_task_data(Array $update_params){
-    
-         $insert_id = DB::table('checklist_data')
-         ->insertGetId($update_params);
-         
-         return $insert_id;
+
+        $exist = DB::select("SELECT id FROM checklist_data WHERE checklist_vnum_record_id = ?", [$update_params['checklist_vnum_record_id']]);
+        
+        if(!empty($exist)){
+            $where_params = ['checklist_vnum_record_id' => $update_params['checklist_vnum_record_id']];
+            DB::table('checklist_data')
+            ->where($where_params)
+            ->update($update_params);
+
+            return true;
+        }else{
+            $insert_id = DB::table('checklist_data')
+            ->insertGetId($update_params);
+            
+            return $insert_id;
+        }
+        
       
     }
 
