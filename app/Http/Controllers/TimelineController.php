@@ -10,13 +10,17 @@ use Auth;
 
 class TimelineController extends Controller
 {
-    public function index(Request $request)
+    public function get_vnum_timline(Request $request)
     {
-        $vnumberId = $request->form_vnumber_id;
+        $org_id = $request->input('org_id');
+        $v_num = $request->input('v_num');
+
        $timelines = DB::table('timelines')
                 ->leftJoin('users', 'users.id', '=', 'timelines.user_id')
-                ->select('timelines.*', 'users.first_name', 'users.last_name')
-                ->where(['form_vnumber_id'=> $vnumberId])
+                ->leftJoin('stations', 'stations.id', '=', 'timelines.station_id')
+                ->select('timelines.*', 'users.first_name', 'users.last_name', 'stations.name')
+                ->where(['form_vnumber_id'=> $v_num])
+                ->where(['timelines.org_id'=> $org_id])
                 ->orderBy('timelines.id', 'desc')
                 ->get();
         return response()->json(['data' => $timelines]);
@@ -29,6 +33,8 @@ class TimelineController extends Controller
             'type' => 'required',
             'text' => 'required',
             'images' => 'nullable',
+            'station_id' => 'required',
+            'org_id' => 'required',
         ]);
 
         $data['created_at'] = now();
