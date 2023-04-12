@@ -59,9 +59,10 @@ class Users extends Model {
 
     public static function get_users_list(Int $org_id){
        
-            $results = DB::select("SELECT u.*, GROUP_CONCAT(DISTINCT us.station_id) AS station_id
+            $results = DB::select("SELECT u.*, IF(u.user_type = 1, 'Admin', IF(u.user_type = 2, 'Supervisor', 'Operator')) AS user_type_name, GROUP_CONCAT(DISTINCT us.station_id) AS station_id, GROUP_CONCAT(DISTINCT s.name) AS station_names
                 FROM users u
                 LEFT JOIN user_station us ON (u.id = us.user_id)
+                LEFT JOIN stations s ON (s.id = us.station_id)
                 WHERE u.org_id = ? AND u.active = 1 GROUP BY u.id", [$org_id]);
             
             return (count($results) > 0) ? $results : false;

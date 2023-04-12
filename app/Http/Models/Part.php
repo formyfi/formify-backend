@@ -54,10 +54,11 @@ class Part extends Model {
 
     public static function get_part_list(Int $org_id){
     
-            $results = DB::select("SELECT pt.*, pt.id AS value, pt.name AS label, GROUP_CONCAT(DISTINCT pv.v_num) AS v_numbers, GROUP_CONCAT(DISTINCT ps.station_id) AS station_id
+            $results = DB::select("SELECT pt.*, pt.id AS value, pt.name AS label, GROUP_CONCAT(DISTINCT pv.v_num) AS v_numbers, GROUP_CONCAT(DISTINCT ps.station_id) AS station_id, GROUP_CONCAT(DISTINCT s.name) AS station_names
                 FROM parts pt
                 LEFT JOIN part_vnumber pv ON (pv.part_id = pt.id)
                 LEFT JOIN part_station ps ON (ps.part_id = pt.id)
+                LEFT JOIN stations s ON (s.id = ps.station_id)
                 WHERE pt.org_id = ? GROUP BY pt.id", [$org_id]);
             
             return (count($results) > 0) ? $results : false;
