@@ -96,6 +96,8 @@ class UserController extends Controller
                 'user_id' => $user['id'],
                 'org_id' => $user['org_id'],
                 'user_type_id' => $user['user_type'],
+                'user_first_name'=>$user['first_name'],
+                'user_last_name'=>$user['last_name'],
                 'user_details' => $user,
                 'stations' => $stations,
                 'org_name' =>  $org_detail?$org_detail->org_name:'-',
