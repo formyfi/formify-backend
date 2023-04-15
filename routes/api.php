@@ -22,6 +22,7 @@ use App\Http\Controllers\{
 
 Route::post('/auth/login', [UserController::class, 'login_user']);
 Route::post('/auth/admin_registration', [UserController::class, 'create_admin_user']);
+Route::post('/auth/social_login', [UserController::class, 'social_login']);
 // Route::post('/auth/logout', [UserController::class, 'logout']);
 
 Route::post('/file/upload', [FileController::class, 'upload']);
@@ -39,7 +40,6 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
    Route::post('/users/create_user', [UserController::class, 'create_user']);
    Route::post('/users/update_user', [UserController::class, 'update_user']);
    Route::post('/users/delete_user', [UserController::class, 'delete_user']);
-   Route::post('/users/social_login', [UserController::class, 'social_login']);
  
    // Stations Get
     Route::get('/stations/get_station_list', [StationController::class, 'get_station_list']);
