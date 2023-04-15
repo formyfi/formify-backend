@@ -33,7 +33,7 @@ class ChecklistController extends Controller
             $list = ChecklistServices::get_checklists((int)$org_id, 'org');
 
             if(!empty($list)){
-                return response()->json(['success' => true, 'checkilists' => $list]);
+                return response()->json(['success' => true, 'checklists' => $list]);
             } else return response()->json(['success' => false]);
         }
 
@@ -50,13 +50,8 @@ class ChecklistController extends Controller
         $unique_id = $request->input('unique_id');
 
         if(empty($id) || empty($unique_id )) return response()->json(['success' => false]);
-        $unique_exist =  Checklist::check_if_station_part_allocated($unique_id, $id);
 
-        if(!empty($unique_exist) && $unique_exist->id !== (int)$id){
-
-            return response()->json(['success' => false, 'message' => "Station <=> Part pair is already assigned to form ID: ".$unique_exist->id]);
-        } else {
-            $exist = ChecklistServices::get_checklists((int)$id, 'id');
+        $exist = ChecklistServices::get_checklists((int)$id, 'id');
             if(empty($exist)) ChecklistServices::insert_checklist(['id'=> $id, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json]);
             else ChecklistServices::update_checklist(['title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json], ['id' => $id]);
             
@@ -64,7 +59,15 @@ class ChecklistController extends Controller
             if(!empty($list)){
                 return response()->json(['success' => true, 'checkilists' => $list]);
             } else return response()->json(['success' => true]);
-        }
+
+        // $unique_exist =  Checklist::check_if_station_part_allocated($unique_id, $id);
+
+        // if(!empty($unique_exist) && $unique_exist->id !== (int)$id){
+
+        //     return response()->json(['success' => false, 'message' => "Station <=> Part pair is already assigned to form ID: ".$unique_exist->id]);
+        // } else {
+            
+        // }
        
     }
 

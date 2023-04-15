@@ -146,6 +146,41 @@ class UserController extends Controller
         
     }
 
+    public function social_login(Request $request){
+        $user_name = $request->input('user_name');
+        $client_id = $request->input('client_id');
+
+        if(empty($user_name) || empty($client_id)) return response()->json(['success' => false]);
+
+        $user = User::where('user_name', $request->user_name)->first();
+
+        if(!empty($user)){
+            Users::upsert_user(['client_id' => $client_id], ['user_name' => $user_name]);
+            $org_detail = Users::get_org_details((int)$user-> org_id);
+            $stations = Users::get_stations_by_user_id((int)$user-> id);
+            if(!empty($stations)) $stations = array_values($stations);
+                return response()->json([
+                'success' => true,
+                'message' => 'User Logged In Successfully',
+                'user_id' => $user['id'],
+                'org_id' => $user['org_id'],
+                'user_type_id' => $user['user_type'],
+                'user_first_name'=>$user['first_name'],
+                'user_last_name'=>$user['last_name'],
+                'user_details' => $user,
+                'stations' => $stations,
+                'org_name' =>  $org_detail?$org_detail->org_name:'-',
+                'token' => $user->createToken("API TOKEN")->plainTextToken
+            ], 200);
+        } else{
+            return response()->json(['success' => false]);
+        }
+        
+
+      
+        
+    }
+
     public function delete_user(Request $request){
         $id = $request->input('id');
         $org_id = $request->input('org_id');
