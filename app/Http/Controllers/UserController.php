@@ -89,6 +89,7 @@ class UserController extends Controller
             $user = User::where('user_name', $request->user_name)->first();
             $org_detail = Users::get_org_details((int)$user-> org_id);
             $stations = Users::get_stations_by_user_id((int)$user-> id);
+            $areas = Users::get_areas_by_user_id((int)$user->id);
             if(!empty($stations)) $stations = array_values($stations);
             return response()->json([
                 'success' => true,
@@ -100,6 +101,7 @@ class UserController extends Controller
                 'user_last_name'=>$user['last_name'],
                 'user_details' => $user,
                 'stations' => $stations,
+                'areas' => $areas,
                 'org_name' =>  $org_detail?$org_detail->org_name:'-',
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ], 200);
@@ -158,6 +160,7 @@ class UserController extends Controller
             Users::upsert_user(['client_id' => $client_id], ['user_name' => $user_name]);
             $org_detail = Users::get_org_details((int)$user-> org_id);
             $stations = Users::get_stations_by_user_id((int)$user-> id);
+            $areas = Users::get_areas_by_user_id((int)$user->id);
             if(!empty($stations)) $stations = array_values($stations);
                 return response()->json([
                 'success' => true,
@@ -169,6 +172,7 @@ class UserController extends Controller
                 'user_last_name'=>$user['last_name'],
                 'user_details' => $user,
                 'stations' => $stations,
+                'areas' => $areas,
                 'org_name' =>  $org_detail?$org_detail->org_name:'-',
                 'token' => $user->createToken("API TOKEN")->plainTextToken
             ], 200);

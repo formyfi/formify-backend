@@ -38,6 +38,14 @@ class Users extends Model {
 
     }
 
+    public static function associate_user_with_area(Array $update_params){
+
+        DB::table('users_area')
+         ->insertGetId($update_params);
+        return true;
+
+    }
+
     
     public static function delete_user(Array $where){
     
@@ -57,12 +65,24 @@ class Users extends Model {
             return true;
     }
 
+    public static function delete_user_area(Array $where){
+    
+        DB::table('users_area')
+        ->where($where)
+        ->delete();
+
+            return true;
+    }
+
+    
     public static function get_users_list(Int $org_id){
        
-            $results = DB::select("SELECT u.*, IF(u.user_type = 1, 'Admin', IF(u.user_type = 2, 'Supervisor', 'Operator')) AS user_type_name, GROUP_CONCAT(DISTINCT us.station_id) AS station_id, GROUP_CONCAT(DISTINCT s.name) AS station_names
+            $results = DB::select("SELECT u.*, GROUP_CONCAT(DISTINCT us.station_id) AS station_id, GROUP_CONCAT(DISTINCT s.name SEPARATOR ', ') AS station_names, GROUP_CONCAT(DISTINCT ua.area_id) AS user_areas, GROUP_CONCAT(DISTINCT a.name SEPARATOR ', ') AS user_areas_names
                 FROM users u
                 LEFT JOIN user_station us ON (u.id = us.user_id)
                 LEFT JOIN stations s ON (s.id = us.station_id)
+                LEFT JOIN users_area ua ON (ua.user_id = u.id)
+                LEFT JOIN functional_areas a ON (a.id = ua.area_id)
                 WHERE u.org_id = ? AND u.active = 1 GROUP BY u.id", [$org_id]);
             
             return (count($results) > 0) ? $results : false;
@@ -76,6 +96,15 @@ class Users extends Model {
             WHERE us.user_id = ?", [$id]);
         
         return (count($results) > 0) ? $results : false;
+    }
+
+    public static function get_areas_by_user_id(Int $id){
+       
+        $results = DB::select("SELECT GROUP_CONCAT(DISTINCT us.area_id) AS areas
+            FROM users_area us
+            WHERE us.user_id = ? GROUP BY us.user_id", [$id]);
+        
+        return (count($results) > 0) ? $results[0] : false;
     }
 
     public static function get_org_details(Int $org_id){
