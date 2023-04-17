@@ -83,7 +83,7 @@ class Users extends Model {
                 LEFT JOIN stations s ON (s.id = us.station_id)
                 LEFT JOIN users_area ua ON (ua.user_id = u.id)
                 LEFT JOIN functional_areas a ON (a.id = ua.area_id)
-                WHERE u.org_id = ? AND u.active = 1 AND u.super_user != 1 GROUP BY u.id", [$org_id]);
+                WHERE u.org_id = ? AND u.active = 1  GROUP BY u.id", [$org_id]);
             
             return (count($results) > 0) ? $results : false;
     }
