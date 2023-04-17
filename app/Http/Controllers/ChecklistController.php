@@ -51,7 +51,7 @@ class ChecklistController extends Controller
 
         if(empty($id) || empty($unique_id )) return response()->json(['success' => false]);
 
-        $exist = ChecklistServices::get_checklists((int)$id, 'id');
+        $exist = ChecklistServices::get_checklists($id, 'id');
             if(empty($exist)) ChecklistServices::insert_checklist(['id'=> $id, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json]);
             else ChecklistServices::update_checklist(['title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json], ['id' => $id]);
             

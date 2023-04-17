@@ -49,7 +49,7 @@ class Checklist extends Model {
 
     }
 
-    public static function get_checklists(Int $id, String $slug){
+    public static function get_checklists($id, String $slug){
 
         if($slug === 'id') $results = DB::select("SELECT s.* FROM forms s WHERE s.id = ?", [$id]);
         
