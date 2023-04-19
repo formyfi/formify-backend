@@ -73,7 +73,7 @@ class Checklist extends Model {
         return (count($results) > 0) ? $results[0] : false;
       }
 
-    public static function get_checklist_form(Int $id, Int $station_id = null, Int $part_id = null){
+    public static function get_checklist_form($id, Int $station_id = null, Int $part_id = null){
         $where = "WHERE id = ?";
         $params = [$id];
         if(!empty($station_id) && !empty($part_id)){
