@@ -9,7 +9,7 @@ class Task extends Model {
 
     //Get Queries
 
-    public static function get_task_entry(Int $station_value, Int $part_value, Int $v_number){
+    public static function get_task_entry(Int $station_value, Int $part_value, $v_number){
 
         $form_data = DB::select("SELECT cd.form_data, cv.id FROM checklist_vnum_record cv JOIN checklist_data cd ON (cd.checklist_vnum_record_id = cv.id) WHERE cv.station_id = ? AND cv.part_id = ? AND cv.vnum_id=?", [$station_value, $part_value, $v_number]);
 

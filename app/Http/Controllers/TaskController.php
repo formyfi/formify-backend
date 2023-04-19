@@ -31,7 +31,7 @@ class TaskController extends Controller
         
         if(empty($station_value) || empty($part_value)) return response()->json(['success' => false]);
 
-        $form_data = TaskService::get_task_form((int)$station_value, (int)$part_value, (int)$v_number);
+        $form_data = TaskService::get_task_form((int)$station_value, (int)$part_value, $v_number);
 
         if(!empty($form_data)){
             return response()->json(['success' => true, 'form_data' => $form_data]);
