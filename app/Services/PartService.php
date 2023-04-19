@@ -24,7 +24,9 @@ class PartService {
         if(empty($where)){
           $part_id =  Part::upsert_part($part_details);
             if(!empty($part_id) && !empty($v_numbers)){
+              Part::delete_part_vnumbers(['part_id' => $part_id]);
               $v_numbers = explode(',', $v_numbers);
+              $v_numbers = array_map('trim',  $v_numbers);
                 foreach ($v_numbers as $key => $v_number) {
                   Part::upsert_part_vnumber(['part_id' => $part_id, 'v_num' => $v_number]);
                 }
@@ -32,7 +34,9 @@ class PartService {
         } else{
           Part::upsert_part($part_details, $where);
           if(!empty($where['id']) && !empty($v_numbers)){
+            Part::delete_part_vnumbers(['part_id' => $where['id']]);
             $v_numbers = explode(',', $v_numbers);
+            $v_numbers = array_map('trim',  $v_numbers);
             foreach ($v_numbers as $key => $v_number) {
               Part::upsert_part_vnumber(['part_id' => $where['id'], 'v_num' => $v_number]);
             }

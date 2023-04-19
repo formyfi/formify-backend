@@ -102,5 +102,14 @@ class Part extends Model {
             return true;
     }
 
+    public static function delete_part_vnumbers(Array $where){
+    
+        DB::table('part_vnumber')
+        ->where($where)
+        ->delete();
+
+            return true;
+    }
+
    
 }
