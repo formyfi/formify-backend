@@ -50,7 +50,7 @@ class TaskService {
       $form_value =  Task::get_task_entry($station_value, $part_value, $v_number);
       $form_json = Checklist::get_checklist_form(0, $station_value, $part_value);
 
-      return ['form_value' => !empty($form_value) ? $form_value : null, 'form_json' => !empty($form_json) ? $form_json->form_json : null, 'form_id' => !empty($form_json) ? $form_json->id : null];
+      return ['form_value' => !empty($form_value) ? $form_value : null, 'form_json' => (!empty($form_json) && empty($form_json->is_draft)) ? $form_json->form_json : null, 'form_id' => !empty($form_json) ? $form_json->id : null];
 
     }
 

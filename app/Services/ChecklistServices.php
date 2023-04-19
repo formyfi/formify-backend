@@ -32,7 +32,7 @@ class ChecklistServices {
 
     }
 
-    public static function get_checklist_form(Int $id){
+    public static function get_checklist_form($id){
 
       return Checklist::get_checklist_form($id);
 

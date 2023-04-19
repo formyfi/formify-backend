@@ -20,7 +20,7 @@ class ChecklistController extends Controller
 
             if(empty($id)) return response()->json(['success' => false]);
         
-            $form = ChecklistServices::get_checklist_form((int)$id);
+            $form = ChecklistServices::get_checklist_form($id);
 
             if(!empty($form)){
                 return response()->json(['success' => true, 'data' => $form->form_json]);
@@ -75,9 +75,10 @@ class ChecklistController extends Controller
         $id = $request->input('id');
         $org_id = $request->input('org_id');
         $form_json = $request->input('form_json');
+        $is_draft = $request->input('is_draft');
 
         if(empty($id)) return response()->json(['success' => false]); 
-        else ChecklistServices::update_checklist(['form_json' => $form_json], ['id' => $id]);
+        else ChecklistServices::update_checklist(['form_json' => $form_json, 'is_draft' => $is_draft], ['id' => $id]);
         
         $list = ChecklistServices::get_checklists((int)$org_id, 'org');
         if(!empty($list)){
