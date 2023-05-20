@@ -34,6 +34,119 @@ class Task extends Model {
         return (count($list) > 0) ? $list : false;
     }
 
+    public static function get_full_tasklist_data(Int $org_id, $start_date, $end_date){
+        
+        if(!empty($start_date) && !empty($end_date)){
+            $start_date = new \DateTime($start_date);
+            $start_date = $start_date->format('Y-m-d');
+
+            $end_date = new \DateTime($end_date);
+            $end_date = $end_date->format('Y-m-d');
+
+            $list = DB::select("SELECT
+            DATE_FORMAT(dates.date, '%m/%d') AS date,
+            COALESCE(total_records, 0) AS total_records,
+            COALESCE(compliant_records, 0) AS compliant_records,
+            COALESCE(non_compliant_records, 0) AS non_compliant_records
+        FROM
+            (
+                SELECT DATE(DATE_ADD(?, INTERVAL n.num DAY)) AS date
+                FROM
+                    (
+                        SELECT (t2.i * 10 + t1.i) num
+                        FROM
+                            (SELECT 0 AS i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t1,
+                            (SELECT 0 AS i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t2
+                    ) n
+                WHERE
+                    DATE(DATE_ADD(?, INTERVAL n.num DAY)) <= ?
+            ) dates
+        LEFT JOIN
+            (
+                SELECT
+                    DATE(created_at) AS date,
+                    COUNT(*) AS total_records,
+                    SUM(compliance_ind) AS compliant_records,
+                    SUM(1 - compliance_ind) AS non_compliant_records
+                FROM
+                    checklist_vnum_record
+                WHERE
+                    org_id = ? AND
+                    created_at >= ? AND
+                    created_at <= ?
+                GROUP BY
+                    DATE(created_at)
+            ) records ON dates.date = records.date
+        ORDER BY
+            dates.date", [ $start_date, $start_date, $end_date, $org_id, $start_date, $end_date]);
+
+        return (count($list) > 0) ? $list : [];
+        
+        }
+}
+
+public static function get_station_tasklist_data(Int $org_id, $start_date, $end_date){
+        
+    if(!empty($start_date) && !empty($end_date)){
+        $start_date = new \DateTime($start_date);
+        $start_date = $start_date->format('Y-m-d');
+
+        $end_date = new \DateTime($end_date);
+        $end_date = $end_date->format('Y-m-d');
+
+        $list = DB::select("SELECT
+        s.id AS station_id,
+        s.name AS station_name,
+        MIN(c.created_at) AS date,
+        COALESCE(COUNT(c.created_at), 0) AS total_records
+    FROM
+        stations s
+    CROSS JOIN
+        (
+            SELECT DATE(DATE_ADD(?, INTERVAL n.num DAY)) AS date
+            FROM
+                (
+                    SELECT (t2.i * 10 + t1.i) num
+                    FROM
+                        (SELECT 0 AS i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t1,
+                        (SELECT 0 AS i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) t2
+                ) n
+            WHERE
+                DATE(DATE_ADD(?, INTERVAL n.num DAY)) <= ?
+        ) dates
+    LEFT JOIN
+        checklist_vnum_record c ON DATE(c.created_at) = dates.date AND c.station_id = s.id AND c.org_id = ?
+    WHERE
+        c.org_id = ?
+        AND c.created_at >= ?
+        AND c.created_at <= ?
+    GROUP BY
+        s.id, dates.date
+    ORDER BY
+        s.id, dates.date
+    ", [ $start_date, $start_date, $end_date, $org_id,$org_id, $start_date, $end_date]);
+
+    return (count($list) > 0) ? $list : [];
+    
+    }
+}
+
+public static function get_total_stations_inspections(Int $org_id){
+
+        $list = DB::select("SELECT
+        s.id AS station_id,
+        s.name AS station_name,
+        COUNT(*) AS total_records,
+        SUM(compliance_ind) AS compliant_records,
+        SUM(1 - compliance_ind) AS non_compliant_records
+    FROM checklist_vnum_record c
+    JOIN stations s ON (c.station_id = s.id)
+    WHERE c.org_id = ?
+    GROUP BY s.id
+    ORDER BY s.id", [$org_id]);
+
+    return (count($list) > 0) ? $list : [];
+}
     
     //Set Queries
 

@@ -70,7 +70,10 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     //Tasks Get
     Route::get('/tasks/get_task_form', [TaskController::class, 'get_task_form']);
     Route::get('/tasks/get_tasklists', [TaskController::class, 'get_tasklists']);
-   
+    Route::get('/tasks/get_full_tasklist_data', [TaskController::class, 'get_full_tasklist_data']);
+    Route::get('/tasks/get_station_tasklist_data', [TaskController::class, 'get_station_tasklist_data']);
+    Route::get('/tasks/get_total_stations_inspections', [TaskController::class, 'get_total_stations_inspections']);
+
      //Tasks Post
     Route::post('/tasks/update_task_form', [TaskController::class, 'update_task_form']);
     

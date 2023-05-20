@@ -18,9 +18,76 @@ class TaskController extends Controller
         if(empty($org_id) || empty($user_id)) return response()->json(['success' => false]);
         
         $list = Task::get_task_list((int)$org_id, (int)$user_id);
-
+        $list = array_values($list);
         if(!empty($list)){
+
+            foreach($list AS $key => $item){
+                $list[$key]->form_json = json_decode($item->form_json, true);
+                $item->form_data = json_decode($item->form_data, true);
+                $name_keys = [];
+                foreach($list[$key]->form_json AS $index => $field){
+                   if($field['type'] !== 'header'){
+                        foreach($item->form_data AS $k=>$fd){
+                            if($field['name'] === $k){
+                                $list[$key]->form_json[$index]['field_value'] = $fd;
+                            } 
+                        }
+                   } 
+                }
+            }
             return response()->json(['success' => true, 'task_lists' => $list]);
+        } else return response()->json(['success' => false]);
+    }
+
+    public function get_full_tasklist_data(Request $request){
+        $org_id = $request->input('org_id');
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
+
+        if(empty($org_id)) return response()->json(['success' => false]);
+        
+        $list = Task::get_full_tasklist_data((int)$org_id, $start_date, $end_date);
+        
+        if(!empty($list)){
+            foreach ($list as $row) {
+                $dates[] = $row->date;
+                $totalRecords[] = $row->total_records;
+                $compliantRecords[] = $row->compliant_records;
+                $nonCompliantRecords[] = $row->non_compliant_records;
+            }
+            return response()->json(['success' => true, 'full_lists' => $list, 'dates' => $dates, 'totalRecords' => $totalRecords, 'compliantRecords' => $compliantRecords, 'nonCompliantRecords' => $nonCompliantRecords]);
+        } else return response()->json(['success' => false]);
+    }
+    
+    public function get_station_tasklist_data(Request $request){
+        $org_id = $request->input('org_id');
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
+
+        if(empty($org_id)) return response()->json(['success' => false]);
+        
+        $list = Task::get_station_tasklist_data((int)$org_id, $start_date, $end_date);
+        
+        if(!empty($list)){
+            foreach ($list as $row) {
+                $dates[] = $row->date;
+                $totalRecords[] = $row->total_records;
+                $compliantRecords[] = $row->compliant_records;
+                $nonCompliantRecords[] = $row->non_compliant_records;
+            }
+            return response()->json(['success' => true, 'full_lists' => $list, 'dates' => $dates, 'totalRecords' => $totalRecords, 'compliantRecords' => $compliantRecords, 'nonCompliantRecords' => $nonCompliantRecords]);
+        } else return response()->json(['success' => false]);
+    }
+
+    public function get_total_stations_inspections(Request $request){
+        $org_id = $request->input('org_id');
+    
+        if(empty($org_id)) return response()->json(['success' => false]);
+        
+        $list = Task::get_total_stations_inspections((int)$org_id);
+        
+        if(!empty($list)){
+            return response()->json(['success' => true, 'full_lists' => $list]);
         } else return response()->json(['success' => false]);
     }
 
