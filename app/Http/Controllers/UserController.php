@@ -162,7 +162,7 @@ class UserController extends Controller
 
         // Update the user's password with the new password
         $user->password = Hash::make($new_password);
-        Users::upsert_user(['password' => $new_password], ['user_name' => $user_id]);
+        Users::upsert_user(['password' => $user->password], ['user_name' => $user_id]);
 
         return response()->json(['success' => true, 'message' => 'Password updated successfully']);
     }
