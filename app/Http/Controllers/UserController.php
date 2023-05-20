@@ -148,6 +148,26 @@ class UserController extends Controller
         
     }
 
+
+    public function update_password(Request $request){
+        $user_id = $request->input('user_id');
+        $old_password = $request->input('old_password');
+        $new_password = $request->input('new_password');
+
+        $user = User::where('user_name', $user_id)->first();
+        // Verify if the old password matches the user's current password
+        if (!Hash::check($old_password, $user->password)) {
+            return response()->json(['success' => false, 'message' => 'Incorrect old password']);
+        }
+
+        // Update the user's password with the new password
+        $user->password = Hash::make($new_password);
+        Users::upsert_user(['password' => $new_password], ['user_name' => $user_id]);
+
+        return response()->json(['success' => true, 'message' => 'Password updated successfully']);
+    }
+
+
     public function social_login(Request $request){
         $user_name = $request->input('user_name');
         $client_id = $request->input('client_id');
