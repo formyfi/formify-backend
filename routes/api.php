@@ -26,6 +26,7 @@ Route::post('/auth/social_login', [UserController::class, 'social_login']);
 // Route::post('/auth/logout', [UserController::class, 'logout']);
 
 Route::post('/file/upload', [FileController::class, 'upload']);
+Route::post('/send-email', [UserController::class, 'sendEmail']);
 
 
 

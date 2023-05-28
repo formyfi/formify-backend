@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Models\{
     Users
   };
+  use Illuminate\Support\Facades\Mail;
+
 class UserController extends Controller
 {
    /**
@@ -165,6 +167,22 @@ class UserController extends Controller
         Users::upsert_user(['password' => $user->password], ['user_name' => $user_id]);
 
         return response()->json(['success' => true, 'message' => 'Password updated successfully']);
+    }
+
+    public function sendEmail(Request $request)
+    {
+        $body = $request->input('body');
+        $subject = 'New Inquiry';
+        
+        $message_body = "The new inquiry made by ".$body['name'].". Company Name:".$body['company_name'].", Message: ".$body['message'].", Phone:".$body['phone'].", Email:".$body['email'];
+       
+        Mail::raw($message_body, function ($message) use ($subject) {
+            $message->to('info@digicheck.ca')
+                    ->subject($subject)
+                    ->from('akshay_patel26@hotmail.com');
+        });
+        
+        return response()->json(['message' => 'Email sent successfully']);
     }
 
 
