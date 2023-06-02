@@ -177,9 +177,9 @@ class UserController extends Controller
         $message_body = "The new inquiry made by ".$body['name'].". Company Name:".$body['company_name'].", Message: ".$body['message'].", Phone:".$body['phone'].", Email:".$body['email'];
        
         Mail::raw($message_body, function ($message) use ($subject) {
-            $message->to('info@digicheck.ca')
+            $message->to('akshay_patel26@hotmail.com')
                     ->subject($subject)
-                    ->from('akshay_patel26@hotmail.com');
+                    ->from('info@digicheck.ca');
         });
         
         return response()->json(['message' => 'Email sent successfully']);
