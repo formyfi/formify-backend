@@ -14,7 +14,8 @@ use App\Http\Models\{
     Users
   };
   use Illuminate\Support\Facades\Mail;
-
+  use Illuminate\Mail\Message as MailMessage;
+  
 class UserController extends Controller
 {
    /**
@@ -186,7 +187,7 @@ class UserController extends Controller
         </body>
         </html>';
     
-        Mail::send([], [], function (Message $message) use ($subject, $message_body) {
+        Mail::send([], [], function (MailMessage $message) use ($subject, $message_body) {
             $message->to('info@digicheck.ca')
                 ->subject($subject)
                 ->from('akshay_patel26@hotmail.com')
@@ -195,6 +196,7 @@ class UserController extends Controller
     
         return response()->json(['message' => 'Email sent successfully']);
     }
+    
 
 
     public function social_login(Request $request){
