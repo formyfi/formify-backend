@@ -170,32 +170,34 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'Password updated successfully']);
     }
 
-    public function sendEmail(Request $request)
-    {
-        $body = $request->input('body');
-        $subject = 'New Inquiry';
-    
-        $message_body = '<html>
-        <head>
-        </head>
-        <body>
-          <p><strong>The new inquiry made by:</strong> ' . $body['name'] . '</p>
-          <p><strong>Company Name:</strong> ' . $body['company_name'] . '</p>
-          <p><strong>Message:</strong> ' . $body['message'] . '</p>
-          <p><strong>Phone:</strong> ' . $body['phone'] . '</p>
-          <p><strong>Email:</strong> ' . $body['email'] . '</p>
-        </body>
-        </html>';
-    
-        Mail::send([], [], function (MailMessage $message) use ($subject, $message_body) {
-            $message->to('info@digicheck.ca')
-                ->subject($subject)
-                ->from('akshay_patel26@hotmail.com')
-                ->setBody($message_body, 'text/html');
-        });
-    
-        return response()->json(['message' => 'Email sent successfully']);
-    }
+
+public function sendEmail(Request $request)
+{
+    $body = $request->input('body');
+    $subject = 'New Inquiry';
+
+    $message_body = '<html>
+    <head>
+    </head>
+    <body>
+      <p><strong>The new inquiry made by:</strong> ' . $body['name'] . '</p>
+      <p><strong>Company Name:</strong> ' . $body['company_name'] . '</p>
+      <p><strong>Message:</strong> ' . $body['message'] . '</p>
+      <p><strong>Phone:</strong> ' . $body['phone'] . '</p>
+      <p><strong>Email:</strong> ' . $body['email'] . '</p>
+    </body>
+    </html>';
+
+    Mail::send([], [], function (MailMessage $message) use ($subject, $message_body) {
+        $message->to('info@digicheck.ca')
+            ->subject($subject)
+            ->from('akshay_patel26@hotmail.com')
+            ->html($message_body);
+    });
+
+    return response()->json(['message' => 'Email sent successfully']);
+}
+
     
 
 
