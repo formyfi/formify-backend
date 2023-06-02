@@ -174,8 +174,18 @@ class UserController extends Controller
         $body = $request->input('body');
         $subject = 'New Inquiry';
         
-        $message_body = "The new inquiry made by ".$body['name'].". Company Name:".$body['company_name'].", Message: ".$body['message'].", Phone:".$body['phone'].", Email:".$body['email'];
-       
+        $message_body = '<html>
+        <head>
+        </head>
+        <body>
+          <p><strong>The new inquiry made by:</strong> ' . $body['name'] . '</p>
+          <p><strong>Company Name:</strong> ' . $body['company_name'] . '</p>
+          <p><strong>Message:</strong> ' . $body['message'] . '</p>
+          <p><strong>Phone:</strong> ' . $body['phone'] . '</p>
+          <p><strong>Email:</strong> ' . $body['email'] . '</p>
+        </body>
+        </html>';
+               
         Mail::raw($message_body, function ($message) use ($subject) {
             $message->to('info@digicheck.ca')
                     ->subject($subject)
