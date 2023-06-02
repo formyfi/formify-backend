@@ -173,7 +173,7 @@ class UserController extends Controller
     {
         $body = $request->input('body');
         $subject = 'New Inquiry';
-        
+    
         $message_body = '<html>
         <head>
         </head>
@@ -185,13 +185,14 @@ class UserController extends Controller
           <p><strong>Email:</strong> ' . $body['email'] . '</p>
         </body>
         </html>';
-               
-        Mail::raw($message_body, function ($message) use ($subject) {
+    
+        Mail::send([], [], function (Message $message) use ($subject, $message_body) {
             $message->to('info@digicheck.ca')
-                    ->subject($subject)
-                    ->from('akshay_patel26@hotmail.com');
+                ->subject($subject)
+                ->from('akshay_patel26@hotmail.com')
+                ->setBody($message_body, 'text/html');
         });
-        
+    
         return response()->json(['message' => 'Email sent successfully']);
     }
 
