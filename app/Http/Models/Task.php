@@ -16,9 +16,20 @@ class Task extends Model {
         return (count($form_data) > 0) ? $form_data[0]->form_data: false;
     }
 
-    public static function get_task_list(Int $org_id, Int $user_id){
+    public static function get_total_task_list(Int $org_id, Int $user_id){
 
-        $list = DB::select("SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
+        $list = DB::select("SELECT COUNT(*) AS total_records
+        FROM checklist_vnum_record cv
+        WHERE cv.org_id = ? AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?) ORDER BY cv.updated_at DESC", [$org_id, $user_id]);
+
+        return (count($list) > 0) ? $list[0]['total_records'] : false;
+    }
+
+    public static function get_task_list(Int $org_id, Int $user_id, Int $perPage = 10, Int $page = 1)
+{
+    $offset = ($page - 1) * $perPage;
+
+    $list = DB::select("SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
         cv.part_id, cv.station_id, cd.last_updated_id, 
         cd.form_data, fs.form_json
         
@@ -29,10 +40,12 @@ class Task extends Model {
         LEFT JOIN forms fs ON fs.id = cv.form_id
         LEFT JOIN users u ON u.id = cd.last_updated_id
         WHERE cv.org_id = ? 
-        AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?) ORDER BY cv.updated_at DESC", [$org_id, $user_id]);
+        AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?) 
+        ORDER BY cv.updated_at DESC
+        LIMIT ? OFFSET ?", [$org_id, $user_id, $perPage, $offset]);
 
-        return (count($list) > 0) ? $list : false;
-    }
+    return (count($list) > 0) ? $list : false;
+}
 
     public static function get_full_tasklist_data(Int $org_id, $start_date, $end_date){
         
@@ -147,7 +160,6 @@ public static function get_total_stations_inspections(Int $org_id){
 
     return (count($list) > 0) ? $list : [];
 }
-    
     //Set Queries
 
     public static function update_checklist_task_data(Array $update_params, Array $where_params){
