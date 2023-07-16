@@ -22,7 +22,7 @@ class TaskController extends Controller
         $list = Task::get_task_list((int)$org_id, (int)$user_id, (int)$perPage, (int)$page);
 
 
-        return response()->json(['success' => false]);
+        return response()->json(['success' => false,'list'=> $list ]);
         $list = array_values($list);
         if(!empty($list)){
 
