@@ -16,31 +16,32 @@ class TaskController extends Controller
         $user_id = $request->input('user_id');
         $perPage = $request->input('perPage');
         $page = $request->input('page');
-
+    
         if(empty($org_id) || empty($user_id)) return response()->json(['success' => false]);
-        
+    
         $list = Task::get_task_list((int)$org_id, (int)$user_id, (int)$perPage, (int)$page);
-        
+    
         $list = array_values($list);
         if(!empty($list)){
-
             foreach($list AS $key => $item){
                 $list[$key]->form_json = json_decode($item->form_json, true);
-                $item->form_data = json_decode($item->form_data, true);
+                $list[$key]->form_data = json_decode($item->form_data, true);
                 $name_keys = [];
                 foreach($list[$key]->form_json AS $index => $field){
-                   if($field['type'] !== 'header'){
-                        foreach($item->form_data AS $k=>$fd){
+                    if($field['type'] !== 'header'){
+                        foreach($list[$key]->form_data AS $k=>$fd){
                             if($field['name'] === $k){
                                 $list[$key]->form_json[$index]['field_value'] = $fd;
-                            } 
+                            }
                         }
-                   } 
+                    }
                 }
             }
             return response()->json(['success' => true, 'task_lists' => $list, 'total_records' => Task::get_total_task_list((int)$org_id, (int)$user_id)]);
-        } else return response()->json(['success' => false]);
-    }
+        } else {
+            return response()->json(['success' => false]);
+        }
+    }    
 
     public function get_full_tasklist_data(Request $request){
         $org_id = $request->input('org_id');
