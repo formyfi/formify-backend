@@ -44,7 +44,7 @@ class Task extends Model {
         ORDER BY cv.updated_at DESC
         LIMIT ? OFFSET ?", [$org_id, $user_id, $perPage, $offset]);
 
-    return (count($list) > 0) ? $list : false;
+    return $list;
 }
 
     public static function get_full_tasklist_data(Int $org_id, $start_date, $end_date){
