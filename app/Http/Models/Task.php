@@ -22,7 +22,7 @@ class Task extends Model {
         FROM checklist_vnum_record cv
         WHERE cv.org_id = ? AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?) ORDER BY cv.updated_at DESC", [$org_id, $user_id]);
 
-        return (count($list) > 0) ? $list[0]['total_records'] : false;
+    return (count($list) > 0) ? $list[0]->total_records : false;
     }
 
     public static function get_task_list(Int $org_id, Int $user_id, Int $perPage = 10, Int $page = 1)
