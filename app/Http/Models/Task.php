@@ -25,11 +25,13 @@ class Task extends Model {
     return (count($list) > 0) ? $list[0]->total_records : false;
     }
 
-    public static function get_task_list(Int $org_id, Int $user_id, Int $perPage = 10, Int $page = 1)
+    public static function get_task_list(Int $org_id, Int $user_id,String $searchText, Int $perPage = 10, Int $page = 1)
 {
     $offset = ($page - 1) * $perPage;
+    $searchText = "%{$searchText}%"; 
 
-    $list = DB::select("SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
+    $list = DB::select("
+        SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
         cv.part_id, cv.station_id, cd.last_updated_id, 
         cd.form_data, fs.form_json
         
@@ -41,8 +43,29 @@ class Task extends Model {
         LEFT JOIN users u ON u.id = cd.last_updated_id
         WHERE cv.org_id = ? 
         AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?) 
+        AND (
+            s.name LIKE ? OR
+            p.name LIKE ? OR
+            cv.vnum_id LIKE ? OR
+            cv.form_id LIKE ? OR
+            cd.form_data LIKE ? OR
+            fs.form_json LIKE ? OR
+            CONCAT(u.first_name, ' ', u.last_name) LIKE ?
+        )
         ORDER BY cv.updated_at DESC
-        LIMIT ? OFFSET ?", [$org_id, $user_id, $perPage, $offset]);
+        LIMIT ? OFFSET ?", [
+            $org_id,
+            $user_id,
+            $searchText, // For station_name (s.name) search
+            $searchText, // For part_name (p.name) search
+            $searchText, // For vnum_id search
+            $searchText, // For form_id search
+            $searchText, // For form_data search
+            $searchText, // For form_json search
+            $searchText, // For last_updated_by_name search
+            $perPage,
+            $offset
+        ]);
 
     return (count($list) > 0) ? $list : false;
 }
