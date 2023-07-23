@@ -28,9 +28,9 @@ class Task extends Model {
     public static function get_task_list(Int $org_id, Int $user_id,String $searchText, Int $perPage = 10, Int $page = 1)
 {
     $offset = ($page - 1) * $perPage;
-    $searchText = "%{$searchText}%"; 
+    if($searchText && $searchText != ''){
+        $searchText = "%{$searchText}%"; 
 
-    if($searchText != ''){
         $list = DB::select("
         SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
         cv.part_id, cv.station_id, cd.last_updated_id, 
