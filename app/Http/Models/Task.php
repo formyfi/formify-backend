@@ -25,7 +25,7 @@ class Task extends Model {
     return (count($list) > 0) ? $list[0]->total_records : false;
     }
 
-    public static function get_task_list(Int $org_id, Int $user_id,String $searchText, Int $perPage = 10, Int $page = 1)
+    public static function get_task_list(Int $org_id, Int $user_id, $searchText, Int $perPage = 10, Int $page = 1)
 {
     $offset = ($page - 1) * $perPage;
     if($searchText && $searchText != ''){
