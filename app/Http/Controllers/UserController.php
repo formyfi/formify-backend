@@ -91,13 +91,14 @@ class UserController extends Controller
 
             $user = User::where('user_name', $request->user_name)->first();
             $org_detail = Users::get_org_details((int)$user-> org_id);
-            $stations = Users::get_stations_by_user_id((int)$user-> id);
+            $stations = Users::get_stations_by_user_id((int)$user-> id, (int)$user-> org_id);
             $areas = Users::get_areas_by_user_id((int)$user->id);
             if(!empty($stations)) $stations = array_values($stations);
             return response()->json([
                 'success' => true,
                 'message' => 'User Logged In Successfully',
                 'user_id' => $user['id'],
+                'super_user_ind' => $user['super_user'],
                 'org_id' => $user['org_id'],
                 'user_type_id' => $user['user_type'],
                 'user_first_name'=>$user['first_name'],
@@ -212,13 +213,14 @@ public function sendEmail(Request $request)
         if(!empty($user)){
             Users::upsert_user(['client_id' => $client_id], ['user_name' => $user_name]);
             $org_detail = Users::get_org_details((int)$user-> org_id);
-            $stations = Users::get_stations_by_user_id((int)$user-> id);
+            $stations = Users::get_stations_by_user_id((int)$user-> id, (int)$user-> org_id);
             $areas = Users::get_areas_by_user_id((int)$user->id);
             if(!empty($stations)) $stations = array_values($stations);
                 return response()->json([
                 'success' => true,
                 'message' => 'User Logged In Successfully',
                 'user_id' => $user['id'],
+                'super_user_ind' => $user['super_user'],
                 'org_id' => $user['org_id'],
                 'user_type_id' => $user['user_type'],
                 'user_first_name'=>$user['first_name'],

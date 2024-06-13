@@ -83,26 +83,27 @@ class Users extends Model {
                 LEFT JOIN stations s ON (s.id = us.station_id)
                 LEFT JOIN users_area ua ON (ua.user_id = u.id)
                 LEFT JOIN functional_areas a ON (a.id = ua.area_id)
-                WHERE u.org_id = ? AND u.active = 1  GROUP BY u.id", [$org_id]);
+                WHERE u.org_id = ? AND u.active = 1 AND u.super_user != 1 GROUP BY u.id", [$org_id]);
             
             return (count($results) > 0) ? $results : false;
     }
 
-    public static function get_stations_by_user_id(Int $id){
+    public static function get_stations_by_user_id(Int $id, Int $org_id){
        
         $results = DB::select("SELECT s.id AS station_id, s.name, s.id AS value
             FROM user_station us
             JOIN stations s ON (s.id = us.station_id)
-            WHERE us.user_id = ?", [$id]);
+            WHERE us.user_id = ? AND s.org_id = ?", [$id, $org_id]);
         
         return (count($results) > 0) ? $results : false;
     }
 
     public static function get_areas_by_user_id(Int $id){
-       
-        $results = DB::select("SELECT GROUP_CONCAT(DISTINCT us.area_id) AS areas
-            FROM users_area us
-            WHERE us.user_id = ? GROUP BY us.user_id", [$id]);
+
+        $results = DB::select("SELECT IF(u.super_user = 1, (SELECT GROUP_CONCAT(DISTINCT id) FROM functional_areas), GROUP_CONCAT(DISTINCT us.area_id)) AS areas
+        FROM users u
+        LEFT JOIN users_area us ON (u.id = us.user_id)
+        WHERE u.id = ? GROUP BY u.id", [$id]);
         
         return (count($results) > 0) ? $results[0] : false;
     }
