@@ -49,11 +49,16 @@ class Checklist extends Model {
 
     }
 
-    public static function get_checklists($id, String $slug){
+    public static function get_checklists_by_id_and_org_id($id, $org_id){
 
-        if($slug === 'id') $results = DB::select("SELECT s.* FROM forms s WHERE s.id = ?", [$id]);
-        
-        if($slug === 'org') $results = DB::select("SELECT s.*, st.name as station_name, pt.name as part_name FROM forms s LEFT JOIN stations st ON st.id=s.station_id LEFT JOIN parts pt ON pt.id=s.part_id  WHERE s.org_id = ? GROUP BY s.id, st.id, pt.id", [$id]);
+        $results = DB::select("SELECT s.* FROM forms s WHERE s.id = ? AND s.org_id = ?", [$id, $org_id]);
+                    
+        return (count($results) > 0) ? $results : false;
+    }
+
+    public static function get_checklists_by_org_id($org_id){
+
+       $results = DB::select("SELECT s.*, st.name as station_name, pt.name as part_name FROM forms s LEFT JOIN stations st ON st.id=s.station_id LEFT JOIN parts pt ON pt.id=s.part_id  WHERE s.org_id = ? GROUP BY s.id, st.id, pt.id", [$org_id]);
             
         return (count($results) > 0) ? $results : false;
     }

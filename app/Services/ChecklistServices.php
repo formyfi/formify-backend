@@ -26,11 +26,17 @@ class ChecklistServices {
         return true;
     }
 
-    public static function get_checklists($id, String $slug){
+    public static function get_checklists_by_id_and_org_id($id, $org_id){
 
-        return Checklist::get_checklists($id, $slug);
+        return Checklist::get_checklists_by_id_and_org_id($id, $org_id);
 
     }
+
+    public static function get_checklists_by_org_id($org_id){
+
+      return Checklist::get_checklists_by_org_id($org_id);
+
+  }
 
     public static function get_checklist_form($id){
 

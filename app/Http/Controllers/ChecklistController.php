@@ -30,7 +30,7 @@ class ChecklistController extends Controller
 
             if(empty($org_id)) return response()->json(['success' => false]);
             
-            $list = ChecklistServices::get_checklists((int)$org_id, 'org');
+            $list = ChecklistServices::get_checklists_by_org_id((int)$org_id);
 
             if(!empty($list)){
                 return response()->json(['success' => true, 'checklists' => $list]);
@@ -51,11 +51,11 @@ class ChecklistController extends Controller
 
         if(empty($id) || empty($unique_id )) return response()->json(['success' => false]);
 
-        $exist = ChecklistServices::get_checklists($id, 'id');
+        $exist = ChecklistServices::get_checklists_by_id_and_org_id($id, $org_id);
             if(empty($exist)) ChecklistServices::insert_checklist(['id'=> $id, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json]);
-            else ChecklistServices::update_checklist(['title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json], ['id' => $id]);
+            else ChecklistServices::update_checklist(['title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json], ['id' => $id, 'org_id' => $org_id]);
             
-            $list = ChecklistServices::get_checklists((int)$org_id, 'org');
+            $list = ChecklistServices::get_checklists_by_org_id((int)$org_id);
             if(!empty($list)){
                 return response()->json(['success' => true, 'checkilists' => $list]);
             } else return response()->json(['success' => true]);
@@ -80,7 +80,7 @@ class ChecklistController extends Controller
         if(empty($id)) return response()->json(['success' => false]); 
         else ChecklistServices::update_checklist(['form_json' => $form_json, 'is_draft' => $is_draft], ['id' => $id]);
         
-        $list = ChecklistServices::get_checklists((int)$org_id, 'org');
+        $list = ChecklistServices::get_checklists_by_org_id((int)$org_id);
         if(!empty($list)){
             return response()->json(['success' => true, 'checkilists' => $list]);
         } else return response()->json(['success' => true]);
@@ -122,7 +122,7 @@ class ChecklistController extends Controller
         if(empty($id)) return response()->json(['success' => true]);
         ChecklistServices::delete_checklist_by_id(['id' => $id]);
 
-        $list = ChecklistServices::get_checklists((int)$org_id, 'org');
+        $list = ChecklistServices::get_checklists_by_org_id((int)$org_id);
         if(!empty($list)){
             return response()->json(['success' => true, 'checkilists' => $list]);
         } else return response()->json(['success' => true]);
