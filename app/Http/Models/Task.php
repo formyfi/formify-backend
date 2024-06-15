@@ -25,16 +25,17 @@ class Task extends Model {
     return (count($list) > 0) ? $list[0]->total_records : false;
     }
 
-    public static function get_task_list(Int $org_id, Int $user_id, $searchText, Int $perPage = 10, Int $page = 1)
+    public static function get_task_list(Int $org_id, Int $user_id, $searchText, Int $perPage = 10, Int $page = 1, $super_user_ind = 0)
 {
     $offset = ($page - 1) * $perPage;
+    $where = '';
+    if(!$super_user_ind) $where = "AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = $user_id)";
     if($searchText && $searchText != ''){
         $searchText = "%{$searchText}%"; 
 
-        $list = DB::select("
-        SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
-        cv.part_id, cv.station_id, cd.last_updated_id, 
-        cd.form_data, fs.form_json
+        $list = DB::select("SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
+            cv.part_id, cv.station_id, cd.last_updated_id, 
+            cd.form_data, fs.form_json
         
         FROM checklist_vnum_record cv 
         LEFT JOIN checklist_data cd ON cd.checklist_vnum_record_id = cv.id
@@ -43,7 +44,6 @@ class Task extends Model {
         LEFT JOIN forms fs ON fs.id = cv.form_id
         LEFT JOIN users u ON u.id = cd.last_updated_id
         WHERE cv.org_id = ? 
-        AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?) 
         AND (
             s.name LIKE ? OR
             p.name LIKE ? OR
@@ -52,11 +52,10 @@ class Task extends Model {
             cd.form_data LIKE ? OR
             fs.form_json LIKE ? OR
             CONCAT(u.first_name, ' ', u.last_name) LIKE ?
-        )
+        ) $where
         ORDER BY cv.updated_at DESC
         LIMIT ? OFFSET ?", [
             $org_id,
-            $user_id,
             $searchText, // For station_name (s.name) search
             $searchText, // For part_name (p.name) search
             $searchText, // For vnum_id search
@@ -68,10 +67,9 @@ class Task extends Model {
             $offset
         ]);
     } else {
-        $list = DB::select("
-        SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
-        cv.part_id, cv.station_id, cd.last_updated_id, 
-        cd.form_data, fs.form_json
+        $list = DB::select("SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
+            cv.part_id, cv.station_id, cd.last_updated_id, 
+            cd.form_data, fs.form_json
         
         FROM checklist_vnum_record cv 
         LEFT JOIN checklist_data cd ON cd.checklist_vnum_record_id = cv.id
@@ -79,15 +77,9 @@ class Task extends Model {
         LEFT JOIN parts p ON p.id = cv.part_id
         LEFT JOIN forms fs ON fs.id = cv.form_id
         LEFT JOIN users u ON u.id = cd.last_updated_id
-        WHERE cv.org_id = ? 
-        AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?)
+        WHERE cv.org_id = ? $where 
         ORDER BY cv.updated_at DESC
-        LIMIT ? OFFSET ?", [
-            $org_id,
-            $user_id,
-            $perPage,
-            $offset
-        ]);
+        LIMIT ? OFFSET ?", [$org_id, $perPage, $offset]);
     }
     
 

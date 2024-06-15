@@ -17,13 +17,14 @@ class TaskController extends Controller
         $perPage = $request->input('perPage');
         $page = $request->input('page');
         $searchText = $request->input('searchText');
-    
+        $super_user_ind = $request->input('super_user_ind');
+        
         if(empty($org_id) || empty($user_id)) return response()->json(['success' => false]);
     
-        $list = (array) Task::get_task_list((int)$org_id, (int)$user_id, $searchText , (int)$perPage, (int)$page);
-    
-        $list = array_values($list);
+        $list = Task::get_task_list((int)$org_id, (int)$user_id, $searchText , (int)$perPage, (int)$page, $super_user_ind);
+        
         if(!empty($list)){
+            $list = array_values((array) $list);
             foreach($list AS $key => $item){
                 $list[$key]->form_json = json_decode($item->form_json, true);
                 $list[$key]->form_data = json_decode($item->form_data, true);
