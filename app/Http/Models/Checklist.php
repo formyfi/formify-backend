@@ -49,9 +49,16 @@ class Checklist extends Model {
 
     }
 
-    public static function get_checklists_by_id_and_org_id($id, $org_id){
+    public static function get_checklists_by_id($id){
 
-        $results = DB::select("SELECT s.* FROM forms s WHERE s.id = ? AND s.org_id = ?", [$id, $org_id]);
+        $results = DB::select("SELECT f.* FROM forms f WHERE f.id = ?", [$id]);
+                    
+        return (count($results) > 0) ? $results : false;
+    }
+
+    public static function get_checklists_by_name_and_org_id($name, $org_id){
+
+        $results = DB::select("SELECT f.* FROM forms f WHERE f.name = ? AND f.org_id = ?", [$name, $org_id]);
                     
         return (count($results) > 0) ? $results : false;
     }
@@ -71,9 +78,9 @@ class Checklist extends Model {
     }
 
     
-    public static function check_if_station_part_allocated(String $unique_id){
+    public static function check_if_station_part_allocated(String $unique_id, $org_id){
         
-        $results = DB::select("SELECT f.id FROM forms f WHERE f.unique_id = ?", [$unique_id]);
+        $results = DB::select("SELECT f.id FROM forms f WHERE f.unique_id = ? AND f.org_id = ?", [$unique_id, $org_id]);
   
         return (count($results) > 0) ? $results[0] : false;
       }
@@ -85,7 +92,7 @@ class Checklist extends Model {
             $where = "WHERE station_id = ? AND part_id = ?";
             $params = [$station_id, $part_id];
         }
-        $results = DB::select("SELECT id, form_json, is_draft FROM forms $where",  $params);
+        $results = DB::select("SELECT id, name, form_json, is_draft FROM forms $where",  $params);
         
         return (count($results) > 0) ? $results[0] : false;
     }
