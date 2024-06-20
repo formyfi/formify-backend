@@ -27,13 +27,29 @@ class Task extends Model {
 
     public static function get_task_list(Int $org_id, Int $user_id, $searchText, Int $perPage = 10, Int $page = 1, $super_user_ind = 0)
 {
-
+    // If a search keyword is provided, reset the page to 1
     if ($searchText && $searchText != '') {
         $page = 1;
     }
+
     $offset = ($page - 1) * $perPage;
     $where = '';
     if(!$super_user_ind) $where = "AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = $user_id)";
+    
+    // Calculate the total number of records
+    $totalRecordsQuery = "SELECT COUNT(*) AS total FROM checklist_vnum_record cv 
+                          LEFT JOIN forms fs ON fs.id = cv.form_id
+                          WHERE cv.org_id = ? AND fs.form_json IS NOT NULL $where";
+    $totalRecordsResult = DB::select($totalRecordsQuery, [$org_id]);
+    $totalRecords = $totalRecordsResult[0]->total;
+
+    // Adjust page number if it exceeds the total number of pages
+    $totalPages = ceil($totalRecords / $perPage);
+    if ($page > $totalPages) {
+        $page = $totalPages;
+        $offset = ($page - 1) * $perPage;
+    }
+
     if($searchText && $searchText != ''){
         $searchText = "%{$searchText}%"; 
 
@@ -57,10 +73,10 @@ class Task extends Model {
         ORDER BY cv.updated_at DESC
         LIMIT ? OFFSET ?", [
             $org_id,
-            $searchText,
-            $searchText,
-            $searchText,
-            $searchText,
+            $searchText, 
+            $searchText, 
+            $searchText, 
+            $searchText, 
             $perPage,
             $offset
         ]);
@@ -80,7 +96,6 @@ class Task extends Model {
         LIMIT ? OFFSET ?", [$org_id, $perPage, $offset]);
     }
     
-
     return (count($list) > 0) ? $list : false;
 }
 
