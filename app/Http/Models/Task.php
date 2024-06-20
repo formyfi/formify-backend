@@ -26,78 +26,72 @@ class Task extends Model {
     }
 
     public static function get_task_list(Int $org_id, Int $user_id, $searchText, Int $perPage = 10, Int $page = 1, $super_user_ind = 0)
-{
-    // If a search keyword is provided, reset the page to 1
-    if ($searchText && $searchText != '') {
-        $page = 1;
-    }
-
-    $offset = ($page - 1) * $perPage;
-    $where = '';
-    if(!$super_user_ind) $where = "AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = $user_id)";
+    {
+        // If a search keyword is provided, reset the page to 1
+        if ($searchText && $searchText != '') {
+            $page = 1;
+        }
     
-    // Calculate the total number of records
-    $totalRecordsQuery = "SELECT COUNT(*) AS total FROM checklist_vnum_record cv 
-                          LEFT JOIN forms fs ON fs.id = cv.form_id
-                          WHERE cv.org_id = ? AND fs.form_json IS NOT NULL $where";
-    $totalRecordsResult = DB::select($totalRecordsQuery, [$org_id]);
-    $totalRecords = $totalRecordsResult[0]->total;
-
-    // Adjust page number if it exceeds the total number of pages
-    $totalPages = ceil($totalRecords / $perPage);
-    if ($page > $totalPages) {
-        $page = $totalPages;
         $offset = ($page - 1) * $perPage;
-    }
-
-    if($searchText && $searchText != ''){
-        $searchText = "%{$searchText}%"; 
-
-        $list = DB::select("SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
-            cv.part_id, cv.station_id, cd.last_updated_id, 
-            cd.form_data, fs.form_json, fs.name AS form_name
-        
-        FROM checklist_vnum_record cv 
-        LEFT JOIN checklist_data cd ON cd.checklist_vnum_record_id = cv.id
-        LEFT JOIN stations s ON s.id = cv.station_id
-        LEFT JOIN parts p ON p.id = cv.part_id
-        LEFT JOIN forms fs ON fs.id = cv.form_id
-        LEFT JOIN users u ON u.id = cd.last_updated_id
-        WHERE cv.org_id = ? AND fs.form_json IS NOT NULL 
-        AND (
-            s.name LIKE ? OR
-            p.name LIKE ? OR
-            cv.vnum_id LIKE ? OR
-            fs.name LIKE ?
-        ) $where
-        ORDER BY cv.updated_at DESC
-        LIMIT ? OFFSET ?", [
-            $org_id,
-            $searchText, 
-            $searchText, 
-            $searchText, 
-            $searchText, 
-            $perPage,
-            $offset
-        ]);
-    } else {
-        $list = DB::select("SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
-            cv.part_id, cv.station_id, cd.last_updated_id, 
-            cd.form_data, fs.form_json, fs.name AS form_name
-        
-        FROM checklist_vnum_record cv 
-        LEFT JOIN checklist_data cd ON cd.checklist_vnum_record_id = cv.id
-        LEFT JOIN stations s ON s.id = cv.station_id
-        LEFT JOIN parts p ON p.id = cv.part_id
-        LEFT JOIN forms fs ON fs.id = cv.form_id
-        LEFT JOIN users u ON u.id = cd.last_updated_id
-        WHERE cv.org_id = ? AND fs.form_json IS NOT NULL $where 
-        ORDER BY cv.updated_at DESC
-        LIMIT ? OFFSET ?", [$org_id, $perPage, $offset]);
-    }
+        $where = '';
+        if(!$super_user_ind) $where = "AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = $user_id)";
     
-    return (count($list) > 0) ? $list : false;
-}
+        // Define the base query
+        $baseQuery = "SELECT s.name AS station_name, p.name AS part_name, cv.vnum_id, cv.form_id, IF(cv.compliance_ind = 1, 'Yes', 'No') AS compliance_ind, CONCAT(u.first_name, ' ' ,u.last_name) AS last_updated_by_name, 
+                cv.part_id, cv.station_id, cd.last_updated_id, 
+                cd.form_data, fs.form_json, fs.name AS form_name
+            FROM checklist_vnum_record cv 
+            LEFT JOIN checklist_data cd ON cd.checklist_vnum_record_id = cv.id
+            LEFT JOIN stations s ON s.id = cv.station_id
+            LEFT JOIN parts p ON p.id = cv.part_id
+            LEFT JOIN forms fs ON fs.id = cv.form_id
+            LEFT JOIN users u ON u.id = cd.last_updated_id
+            WHERE cv.org_id = ? AND fs.form_json IS NOT NULL $where";
+    
+        // If a search keyword is provided, modify the query
+        if ($searchText && $searchText != '') {
+            $searchText = "%{$searchText}%";
+            $baseQuery .= " AND (
+                s.name LIKE ? OR
+                p.name LIKE ? OR
+                cv.vnum_id LIKE ? OR
+                cv.form_id LIKE ? OR
+                cd.form_data LIKE ? OR
+                fs.form_json LIKE ? OR
+                CONCAT(u.first_name, ' ', u.last_name) LIKE ?
+            )";
+        }
+    
+        // Calculate the total number of records matching the query
+        $totalRecordsQuery = "SELECT COUNT(*) AS total FROM ($baseQuery) AS subquery";
+        $totalRecordsParams = [$org_id];
+        if ($searchText && $searchText != '') {
+            array_push($totalRecordsParams, $searchText, $searchText, $searchText, $searchText, $searchText, $searchText, $searchText);
+        }
+        $totalRecordsResult = DB::select($totalRecordsQuery, $totalRecordsParams);
+        $totalRecords = $totalRecordsResult[0]->total;
+    
+        // Calculate the total number of pages
+        $totalPages = ceil($totalRecords / $perPage);
+    
+        // Adjust the offset if the current page exceeds the total number of pages
+        if ($page > $totalPages) {
+            $page = $totalPages;
+            $offset = ($page - 1) * $perPage;
+        }
+    
+        // Final query with limit and offset
+        $finalQuery = $baseQuery . " ORDER BY cv.updated_at DESC LIMIT ? OFFSET ?";
+        $queryParams = [$org_id];
+        if ($searchText && $searchText != '') {
+            array_push($queryParams, $searchText, $searchText, $searchText, $searchText, $searchText, $searchText, $searchText);
+        }
+        array_push($queryParams, $perPage, $offset);
+    
+        $list = DB::select($finalQuery, $queryParams);
+    
+        return (count($list) > 0) ? $list : false;
+    }    
 
     public static function get_full_tasklist_data(Int $org_id, $start_date, $end_date){
         
