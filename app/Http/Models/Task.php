@@ -27,6 +27,10 @@ class Task extends Model {
 
     public static function get_task_list(Int $org_id, Int $user_id, $searchText, Int $perPage = 10, Int $page = 1, $super_user_ind = 0)
 {
+
+    if ($searchText && $searchText != '') {
+        $page = 1;
+    }
     $offset = ($page - 1) * $perPage;
     $where = '';
     if(!$super_user_ind) $where = "AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = $user_id)";
@@ -48,21 +52,15 @@ class Task extends Model {
             s.name LIKE ? OR
             p.name LIKE ? OR
             cv.vnum_id LIKE ? OR
-            cv.form_id LIKE ? OR
-            cd.form_data LIKE ? OR
-            fs.form_json LIKE ? OR
-            CONCAT(u.first_name, ' ', u.last_name) LIKE ?
+            fs.name LIKE ? OR
         ) $where
         ORDER BY cv.updated_at DESC
         LIMIT ? OFFSET ?", [
             $org_id,
-            $searchText, // For station_name (s.name) search
-            $searchText, // For part_name (p.name) search
-            $searchText, // For vnum_id search
-            $searchText, // For form_id search
-            $searchText, // For form_data search
-            $searchText, // For form_json search
-            $searchText, // For last_updated_by_name search
+            $searchText,
+            $searchText,
+            $searchText,
+            $searchText,
             $perPage,
             $offset
         ]);
