@@ -52,7 +52,7 @@ class Task extends Model {
             s.name LIKE ? OR
             p.name LIKE ? OR
             cv.vnum_id LIKE ? OR
-            fs.name LIKE ? OR
+            fs.name LIKE ?
         ) $where
         ORDER BY cv.updated_at DESC
         LIMIT ? OFFSET ?", [
