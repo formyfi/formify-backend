@@ -162,9 +162,9 @@ class TaskController extends Controller
                 }
             } else $is_compliant = 0;
         }
-        
+        $id = Task::check_task_entry($station_id, $part_id, $part_vnumber);
         if(!empty($id)){
-            Task::update_checklist_task_data(['form_data' => $form_json, 'last_updated_id' => $user_id], ['id' => $id]);
+            Task::update_checklist_task_data(['form_data' => $form_json, 'last_updated_id' => $user_id], ['checklist_vnum_record_id' => $id]);
             return response()->json(['success' => true, "update" => true]);
         } else {
            $record_id = Task::insert_checklist_task_record(['form_id'=> $form_id, 'part_id' => $part_id, 'compliance_ind' => $is_compliant ,'vnum_id' => $part_vnumber,'station_id' => $station_id, 'org_id' => $org_id, 'last_updated_id' => $user_id]);

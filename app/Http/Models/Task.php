@@ -15,6 +15,12 @@ class Task extends Model {
 
         return (count($form_data) > 0) ? $form_data[0]->form_data: false;
     }
+    public static function check_task_entry(Int $station_value, Int $part_value, $v_number){
+
+        $form_data = DB::select("SELECT cv.id FROM checklist_vnum_record cv WHERE cv.station_id = ? AND cv.part_id = ? AND cv.vnum_id=?", [$station_value, $part_value, $v_number]);
+
+        return (count($form_data) > 0) ? $form_data[0]->id: false;
+    }
 
     public static function get_total_task_list(Int $org_id, Int $user_id){
 
