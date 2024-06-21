@@ -32,7 +32,7 @@ class Task extends Model {
     if ($searchText && $searchText != '') {
         $page = 1;
     }
-    $offset = 0;
+   $offset = ($page - 1) * $perPage;
     $where = '';
     if(!$super_user_ind) $where = "AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = $user_id)";
     if($searchText && $searchText != ''){
