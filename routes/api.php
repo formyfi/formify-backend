@@ -78,7 +78,7 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
 
      //Tasks Post
     Route::post('/tasks/update_task_form', [TaskController::class, 'update_task_form']);
-    
+    Route::post('/tasks/unlock_form', [TaskController::class, 'unlock_form']);
 
     // create timelines
     Route::post('/timelines/upload', [TimelineController::class, 'store']);

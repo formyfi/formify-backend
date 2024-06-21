@@ -101,17 +101,34 @@ class TaskController extends Controller
         $station_value = $request->input('station_value');
         $part_value = $request->input('part_value');
         $v_number = $request->input('v_number');
-        
+        $user_id = $request->input('user_id');
+
         if(empty($station_value) || empty($part_value)) return response()->json(['success' => false]);
+
 
         $form_data = TaskService::get_task_form((int)$station_value, (int)$part_value, $v_number);
 
         if(!empty($form_data)){
-            return response()->json(['success' => true, 'form_data' => $form_data]);
+            $exist = Task::check_if_form_is_locked($user_id, $station_value, $part_value, $v_number);
+            if($exist){
+                return response()->json(['success' => true, 'locked_by_user_id' => $exist->locked_by_user_id, 'locked_by_user_name' => $exist->locked_by_user_name, 'form_data' => $form_data]);
+            } else{
+                Task::lock_form_by_user_id(['station_id' => $station_value, 'part_id' => $part_value, 'part_vnum' => $v_number, 'locked_by_user_id' => $user_id, 'lock_ind' => 1]);
+                return response()->json(['success' => true, 'locked_by_user_id' => null, 'locked_by_user_name' => null, 'form_data' => $form_data]);
+            }
+            
         } else return response()->json(['success' => false]);
 
     }
     
+    public static function unlock_form(Request $request){
+        $user_id = $request->input('user_id');
+
+        if(!empty($user_id)){
+            Task::unlock_form_by_user_id($user_id);
+        }
+        return response()->json(['success' => true]);
+    }
     public static function update_task_form(Request $request){
         $id = $request->input('id');
         $form_id = $request->input('form_id');
@@ -121,11 +138,13 @@ class TaskController extends Controller
         $org_id = $request->input('org_id');
         $form_json = $request->input('form_json');
         $user_id = $request->input('user_id');
+        $is_completed = $request->input('is_completed');
 
         if(empty($form_id) || empty($part_vnumber) || empty($form_json)) return response()->json(['success' => false]);
 
         if(!empty($form_json)){
-            $form_array = json_decode($form_json, true);
+            if(!is_array($form_json)) $form_array = json_decode($form_json, true);
+            else $form_array = $form_json;
             $is_compliant = 1;
             if(!empty($form_array)){
                 foreach($form_array AS $fs){
@@ -165,9 +184,10 @@ class TaskController extends Controller
         $id = Task::check_task_entry($station_id, $part_id, $part_vnumber);
         if(!empty($id)){
             Task::update_checklist_task_data(['form_data' => $form_json, 'last_updated_id' => $user_id], ['checklist_vnum_record_id' => $id]);
+            Task::insert_checklist_task_record(['form_id'=> $form_id, 'part_id' => $part_id, 'is_completed' => $is_completed, 'compliance_ind' => $is_compliant ,'vnum_id' => $part_vnumber,'station_id' => $station_id, 'org_id' => $org_id, 'last_updated_id' => $user_id]);
             return response()->json(['success' => true, "update" => true]);
         } else {
-           $record_id = Task::insert_checklist_task_record(['form_id'=> $form_id, 'part_id' => $part_id, 'compliance_ind' => $is_compliant ,'vnum_id' => $part_vnumber,'station_id' => $station_id, 'org_id' => $org_id, 'last_updated_id' => $user_id]);
+           $record_id = Task::insert_checklist_task_record(['form_id'=> $form_id, 'part_id' => $part_id, 'is_completed' => $is_completed, 'compliance_ind' => $is_compliant ,'vnum_id' => $part_vnumber,'station_id' => $station_id, 'org_id' => $org_id, 'last_updated_id' => $user_id]);
            
            if(!empty($record_id)){
             Task::insert_checklist_task_data(['checklist_vnum_record_id' => $record_id,'form_data' => $form_json, 'last_updated_id' => $user_id]);

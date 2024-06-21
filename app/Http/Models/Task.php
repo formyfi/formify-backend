@@ -47,7 +47,7 @@ class Task extends Model {
         WHERE cv.org_id = ? AND fs.form_json IS NOT NULL 
         AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?)
         AND (s.name LIKE ? OR p.name LIKE ? OR cv.vnum_id LIKE ? OR fs.name LIKE ?)
-        ORDER BY cv.updated_at DESC", [$org_id, $searchText, $searchText, $searchText, $searchText,]);
+        ORDER BY cv.updated_at DESC", [$org_id, $user_id, $searchText, $searchText, $searchText, $searchText]);
 
     return (count($list) > 0) ? $list[0]->total_records : false;
     }
@@ -208,6 +208,37 @@ public static function get_station_tasklist_data(Int $org_id, $start_date, $end_
     }
 }
 
+public static function lock_form_by_user_id($update_params){
+    $exist = DB::select("SELECT tl.locked_by_user_id FROM task_locker tl WHERE tl.locked_by_user_id = ? AND tl.station_id = ? AND tl.part_id = ? AND tl.part_vnum = ? AND lock_ind = 1", [$update_params['locked_by_user_id'], $update_params['station_id'], $update_params['part_id'], $update_params['part_vnum']]);
+
+        if(empty($exist)){
+            DB::table('task_locker')
+            ->insert($update_params);
+
+            return true;
+        }
+           
+}
+
+public static function unlock_form_by_user_id($user_id){
+        
+    
+        $where_params = ['locked_by_user_id' => $user_id];
+        $update_params = ['lock_ind' => 0];
+
+        DB::table('task_locker')
+        ->where($where_params)
+        ->update($update_params);
+
+        return true;
+}
+
+public static function check_if_form_is_locked($user_id, $station_id, $part_id, $part_vnum){
+        
+    $exist = DB::select("SELECT tl.locked_by_user_id, CONCAT(u.first_name,' ',u.last_name) AS locked_by_user_name FROM task_locker tl JOIN users u ON u.id = tl.locked_by_user_id WHERE tl.locked_by_user_id != ? AND tl.station_id = ? AND tl.part_id = ? AND tl.part_vnum = ? AND lock_ind = 1", [$user_id, $station_id, $part_id, $part_vnum]);
+    return (count($exist) > 0) ? $exist[0] : [];
+}
+
 public static function get_total_stations_inspections(Int $org_id){
 
         $list = DB::select("SELECT
@@ -241,20 +272,20 @@ public static function get_total_stations_inspections(Int $org_id){
             $user_id = $update_params['last_updated_id'];
             unset($update_params['last_updated_id']);
         
-            $exist = DB::select("SELECT id FROM checklist_vnum_record WHERE form_id = ? AND vnum_id = ?", [$update_params['form_id'], $update_params['vnum_id']]);
+            $exist = DB::select("SELECT id FROM checklist_vnum_record WHERE form_id = ? AND vnum_id = ? AND org_id = ?", [$update_params['form_id'], $update_params['vnum_id'], $update_params['org_id']]);
             $station_name = DB::select("SELECT st.name FROM stations st WHERE id = ? AND org_id = ?", [$update_params['station_id'], $update_params['org_id']]);
             $user_name = DB::select("SELECT CONCAT(first_name, ' ', last_name) AS name FROM users WHERE id = ? AND org_id = ?", [ $user_id, $update_params['org_id']]);
-            $complaint = $update_params['compliance_ind'] ? '[Compliant]' : '[Non Compliant]';
+            $complaint = empty($update_params['is_completed']) ? '' : ($update_params['compliance_ind'] ? '[Compliant]' : '[Non Compliant]');
             $data = [];
 
            if(empty($exist)){
                 $insert_id = DB::table('checklist_vnum_record')
                 ->insertGetId($update_params);
-                
+                $text = empty($update_params['is_completed']) ? 'Inspection progress saved at '.$station_name[0]->name.' By '.$user_name[0]->name : 'A new inspection completed at '.$station_name[0]->name.' By '.$user_name[0]->name.'. '.$complaint;
                 $data = [
                     'form_vnumber_id' => $update_params['vnum_id'],
                     'type' => 'new_form_submitted',
-                    'text' => 'A new inspection submitted at '.$station_name[0]->name.' By '.$user_name[0]->name.'. '.$complaint,
+                    'text' => $text,
                     'org_id' => $update_params['org_id'],
                     'station_id' => $update_params['station_id'],
                     'user_id' =>  0,
@@ -268,11 +299,12 @@ public static function get_total_stations_inspections(Int $org_id){
                 DB::table('checklist_vnum_record')
                 ->where($where_params)
                 ->update($update_params);
+                $text = empty($update_params['is_completed']) ? 'Inspection progress saved at '.$station_name[0]->name.' By '.$user_name[0]->name : 'A new inspection completed at '.$station_name[0]->name.' By '.$user_name[0]->name.'. '.$complaint;
 
                 $data = [
                     'form_vnumber_id' => $update_params['vnum_id'],
                     'type' => 'new_form_submitted',
-                    'text' => 'Inspection resubmitted at '.$station_name[0]->name.' By '.$user_name[0]->name.'. '.$complaint,
+                    'text' => $text,
                     'org_id' => $update_params['org_id'],
                     'station_id' => $update_params['station_id'],
                     'user_id' =>  0,

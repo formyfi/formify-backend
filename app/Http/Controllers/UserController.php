@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Models\{
-    Users
+    Users, Task
   };
   use Illuminate\Support\Facades\Mail;
   use Illuminate\Mail\Message as MailMessage;
@@ -249,7 +249,7 @@ public function sendEmail(Request $request)
         UserServices::delete_user(['id' => $id]);
         
         $list = UserServices::get_users_list((int)$org_id);
-        
+        Task::unlock_form_by_user_id($id);
         if(!empty($list)){
             return response()->json(['success' => true, 'user_list' => $list]);
         } else return response()->json(['success' => true]);
@@ -260,6 +260,7 @@ public function sendEmail(Request $request)
 
         $user_id = Auth::user()->id;
         $user = User::find($user_id);
+        Task::unlock_form_by_user_id($user_id);
         $user->tokens()->delete();
         
         return response()->json(['success' => true]);
