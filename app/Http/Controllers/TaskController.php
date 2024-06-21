@@ -129,7 +129,7 @@ class TaskController extends Controller
             $is_compliant = 1;
             if(!empty($form_array)){
                 foreach($form_array AS $fs){
-                    if(strtolower($fs) === 'fail' || strtolower($fs) === 'no' || strtolower($fs) === 'reject'){
+                    if (is_string($fs) && (strtolower($fs) === 'fail' || strtolower($fs) === 'no' || strtolower($fs) === 'reject')) {
                         $is_compliant = 0;
                         break;
                     }
