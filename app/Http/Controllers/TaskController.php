@@ -39,7 +39,7 @@ class TaskController extends Controller
                     }
                 }
             }
-            return response()->json(['success' => true, 'task_lists' => $list, 'total_records' => Task::get_total_task_list((int)$org_id, (int)$user_id)]);
+            return response()->json(['success' => true, 'task_lists' => $list, 'total_records' => (!empty($searchText)) ? Task::get_total_task_list_with_search_text((int)$org_id, (int)$user_id, $searchText) : Task::get_total_task_list((int)$org_id, (int)$user_id)]);
         } else {
             return response()->json(['success' => false]);
         }
