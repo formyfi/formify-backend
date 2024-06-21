@@ -81,7 +81,7 @@ class Task extends Model {
             cv.vnum_id LIKE ? OR
             fs.name LIKE ?
         ) $where
-        ORDER BY cv.updated_at DESC
+        ORDER BY cd.updated_at DESC
         LIMIT ? OFFSET ?", [
             $org_id,
             $searchText,
@@ -103,7 +103,7 @@ class Task extends Model {
         LEFT JOIN forms fs ON fs.id = cv.form_id
         LEFT JOIN users u ON u.id = cd.last_updated_id
         WHERE cv.org_id = ? AND fs.form_json IS NOT NULL $where 
-        ORDER BY cv.updated_at DESC
+        ORDER BY cd.updated_at DESC
         LIMIT ? OFFSET ?", [$org_id, $perPage, $offset]);
     }
     
