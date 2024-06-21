@@ -20,6 +20,7 @@ class Task extends Model {
 
         $list = DB::select("SELECT COUNT(*) AS total_records
         FROM checklist_vnum_record cv
+        LEFT JOIN forms fs ON fs.id = cv.form_id
         WHERE cv.org_id = ? AND fs.form_json IS NOT NULL AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = ?) ORDER BY cv.updated_at DESC", [$org_id, $user_id]);
 
     return (count($list) > 0) ? $list[0]->total_records : false;
