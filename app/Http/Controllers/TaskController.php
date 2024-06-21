@@ -24,7 +24,7 @@ class TaskController extends Controller
         $list = Task::get_task_list((int)$org_id, (int)$user_id, $searchText , (int)$perPage, (int)$page, $super_user_ind);
         
         if(!empty($list)){
-            $list = array_values((array) $list);
+            //$list = array_values((array) $list);
             foreach($list AS $key => $item){
                 $list[$key]->form_json = json_decode($item->form_json, true);
                 $list[$key]->form_data = json_decode($item->form_data, true);
