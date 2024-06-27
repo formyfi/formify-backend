@@ -89,7 +89,7 @@ class Checklist extends Model {
         $where = "WHERE id = ?";
         $params = [$id];
         if(!empty($station_id) && !empty($part_id)){
-            $where = "WHERE org_id = ? station_id = ? AND part_id = ?";
+            $where = "WHERE org_id = ? AND station_id = ? AND part_id = ?";
             $params = [$org_id, $station_id, $part_id];
         }
         $results = DB::select("SELECT id, name, form_json, is_draft FROM forms $where",  $params);
