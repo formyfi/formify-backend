@@ -102,11 +102,12 @@ class TaskController extends Controller
         $part_value = $request->input('part_value');
         $v_number = $request->input('v_number');
         $user_id = $request->input('user_id');
+        $org_id = $request->input('org_id');
 
         if(empty($station_value) || empty($part_value)) return response()->json(['success' => false]);
 
 
-        $form_data = TaskService::get_task_form((int)$station_value, (int)$part_value, $v_number);
+        $form_data = TaskService::get_task_form($org_id, (int)$station_value, (int)$part_value, $v_number);
 
         if(!empty($form_data)){
             $exist = Task::check_if_form_is_locked($user_id, $station_value, $part_value, $v_number);
