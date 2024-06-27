@@ -47,7 +47,6 @@ class ChecklistController extends Controller
         $part_value = $request->input('part');
         $station_value = $request->input('station');
         $org_id = $request->input('org_id');
-        $form_json = $request->input('form_json');
         $unique_id = $request->input('unique_id');
 
         if(empty($name)) return response()->json(['success' => false]);
@@ -56,25 +55,17 @@ class ChecklistController extends Controller
             if(empty($exist)){
                 $duplicate_name = Checklist::get_checklists_by_name_and_org_id($name, $org_id);
                 $unique_exist =  Checklist::check_if_station_part_allocated($unique_id, $org_id);
-                if(empty($duplicate_name) && empty($unique_exist)) ChecklistServices::insert_checklist(['name'=> $name, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json]);
+                if(empty($duplicate_name) && empty($unique_exist)){
+                    ChecklistServices::insert_checklist(['name'=> $name, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value]); 
+                } 
                 else return response()->json(['success' => false, 'message' => !empty($duplicate_name) ? "Duplicate form name." : "Only one form can be created per part per operation."]);
             
-            } 
-            else ChecklistServices::update_checklist(['name'=> $name, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value, 'form_json' => $form_json], ['id' => $id]);
+            } else ChecklistServices::update_checklist(['name'=> $name, 'title' => $title, 'unique_id' => $unique_id,'part_id' => $part_value, 'org_id' => $org_id, 'station_id' => $station_value], ['id' => $id]);
             
             $list = ChecklistServices::get_checklists_by_org_id((int)$org_id);
             if(!empty($list)){
                 return response()->json(['success' => true, 'checkilists' => $list]);
             } else return response()->json(['success' => true]);
-
-        
-
-        // if(!empty($unique_exist) && $unique_exist->id !== (int)$id){
-
-        //     return response()->json(['success' => false, 'message' => "Station <=> Part pair is already assigned to form ID: ".$unique_exist->id]);
-        // } else {
-            
-        // }
        
     }
 
