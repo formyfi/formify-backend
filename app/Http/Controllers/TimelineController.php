@@ -37,7 +37,6 @@ class TimelineController extends Controller
             'org_id' => 'required',
         ]);
 
-        $data['created_at'] = now();
         $data['user_id'] = Auth::user()->id;
         $timelineId = DB::table('timelines')->insertGetId($data);
         $timeline = DB::table('timelines')->find($timelineId);
