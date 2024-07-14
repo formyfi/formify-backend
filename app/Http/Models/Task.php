@@ -52,7 +52,7 @@ class Task extends Model {
     return (count($list) > 0) ? $list[0]->total_records : false;
     }
 
-    public static function get_task_list(Int $org_id, Int $user_id, $searchText, Int $perPage = 10, Int $page = 1, $super_user_ind = 0)
+    public static function get_task_list(Int $org_id, Int $user_id, $searchText, Int $perPage = 10, Int $page = 1, $super_user_ind = 0, $filters)
 {
 
     if ($searchText && $searchText != '') {
@@ -60,7 +60,26 @@ class Task extends Model {
     }
    $offset = ($page - 1) * $perPage;
     $where = '';
-    if(!$super_user_ind) $where = "AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = $user_id)";
+    if(!$super_user_ind) $where = " AND EXISTS (SELECT 1 FROM user_station us WHERE us.station_id = cv.station_id AND us.user_id = $user_id)";
+    if(!empty($filters)){
+        if(!empty($filters['station_name'])){
+            $station_name = $filters['station_name'];
+            $where .= " AND s.name = '$station_name'";
+        }
+        if(!empty($filters['part_name'])){
+            $part_name = $filters['part_name'];
+            $where .= " AND p.name = '$part_name'";
+        }
+        if(!empty($filters['form_name'])){
+            $form_name = $filters['form_name'];
+            $where .= " AND fs.name = '$form_name'";
+        }
+        if(!empty($filters['compliance_ind'])){
+            if($filters['compliance_ind'] == 'Yes') $where .= " AND cv.compliance_ind = 1";
+            if($filters['compliance_ind'] == 'No') $where .= " AND cv.compliance_ind = 0";
+            
+        }
+    }
     if($searchText && $searchText != ''){
         $searchText = "%{$searchText}%";
 
